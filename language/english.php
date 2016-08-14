@@ -3,7 +3,7 @@
 // +---------------------------------------------------------------------------+
 // | Tag Plugin for Geeklog - The Ultimate Weblog                              |
 // +---------------------------------------------------------------------------|
-// | geeklog/plugins/tag/language/english_utf-8.php                            |
+// | geeklog/plugins/tag/language/english.php                                  |
 // +---------------------------------------------------------------------------|
 // | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
 // |                                                                           |
@@ -30,7 +30,7 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------|
 
-$LANG_CHARSET = 'utf-8';
+$LANG_CHARSET = 'iso-8859-1';
 
 $LANG_TAG = array(
     'plugin'            => 'tag Plugin',

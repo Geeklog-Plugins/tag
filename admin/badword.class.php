@@ -30,20 +30,22 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-//
-// $Id$
 
 require_once '../../../lib-common.php';
 
-// Only let admin users access this page
+/**
+* Only let admin users access this page
+*/
 if (!SEC_hasRights('tag.admin')) {
-    // Someone is trying to illegally access this page
+    /**
+	* Someone is trying to illegally access this page
+	*/
     COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
-    $display  = COM_siteHeader();
-    $display .= COM_startBlock($LANG_TAG['access_denied']);
-    $display .= $LANG_TAG['access_denied_msg'];
-    $display .= COM_endBlock();
-    $display .= COM_siteFooter(true);
+    $display = COM_siteHeader()
+			 . COM_startBlock(TAG_str('access_denied'))
+			 . TAG_str('access_denied_msg')
+			 . COM_endBlock()
+			 . COM_siteFooter();
     echo $display;
     exit;
 }
@@ -51,7 +53,6 @@ if (!SEC_hasRights('tag.admin')) {
 /**
 * Main 
 */
-
 class TagBadword
 {
 	function TagBadword()
@@ -117,7 +118,9 @@ class TagBadword
 	{
 		global $_TABLES;
 		
-		// Add a bad word into DB
+		/**
+		* Add a bad word into DB
+		*/
 		$word = TAG_post('word');
 		$sql = "INSERT INTO {$_TABLES['tag_badwords']} (badword) "
 			 . "VALUES ('" . addslashes($word) . "')";
@@ -157,7 +160,9 @@ class TagBadword
 			return '';
 		}
 		
-		// Delete a bad word from DB
+		/**
+		* Delete a bad word from DB
+		*/
 		$words4db = array_map('addslashes', $words);
 		$words4db = "('" . implode("','", $words4db) . "')";
 		
@@ -165,7 +170,9 @@ class TagBadword
 			 . "WHERE (badword IN " . $words4db . ")";
 		$result = DB_query($sql);
 		
-		// Rescan articles for the unbanned bad word
+		/**
+		* Rescan articles for the unbanned bad word
+		*/
 		foreach ($words as $tag) {
 			TAG_rescanTag($tag);
 		}
@@ -173,4 +180,3 @@ class TagBadword
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
 	}
 }
-?>

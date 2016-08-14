@@ -30,20 +30,22 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-//
-// $Id$
 
 require_once '../../../lib-common.php';
 
-// Only let admin users access this page
+/**
+* Only let admin users access this page
+*/
 if (!SEC_hasRights('tag.admin')) {
-    // Someone is trying to illegally access this page
+    /**
+	* Someone is trying to illegally access this page
+	*/
     COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
-    $display  = COM_siteHeader();
-    $display .= COM_startBlock($LANG_TAG['access_denied']);
-    $display .= $LANG_TAG['access_denied_msg'];
-    $display .= COM_endBlock();
-    $display .= COM_siteFooter(true);
+    $display = COM_siteHeader()
+			 . COM_startBlock($LANG_TAG['access_denied'])
+			 . TAG_str('access_denied_msg')
+			 . COM_endBlock()
+			 . COM_siteFooter();
     echo $display;
     exit;
 }
@@ -51,7 +53,6 @@ if (!SEC_hasRights('tag.admin')) {
 /**
 * Main 
 */
-
 class TagStats
 {
 	function TagStats()
@@ -174,5 +175,3 @@ class TagStats
 		
 	}
 }
-
-?>

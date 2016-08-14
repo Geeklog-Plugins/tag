@@ -4,7 +4,7 @@
 	<table class="plugin">
 		<tr>
 			<th>{lang_menu_name}</th>
-			<td><input name="menu_name" type="text" size="50" value="{menu_name}"></td>
+			<td><input name="menu_name" type="text" size="50" value="{menu_name}"{xhtml}></td>
 		</tr>
 		<tr>
 			<th>{lang_menu_parent}</th>
@@ -12,12 +12,12 @@
 		</tr>
 		<tr>
 			<th>{lang_menu_tags}</th>
-			<td><input name="menu_tags" type="text" size="100" value="{menu_tags}"></td>
+			<td><input name="menu_tags" type="text" size="100" value="{menu_tags}"{xhtml}></td>
 		</tr>
 	</table>
-	<input name="cmd" type="hidden" value="menuconfig">
-	<input name="action" type="hidden" value="{action}">
-	<input name="menu_id" type="hidden" value="{menu_id}">
-	<input name="submit" type="submit" value="{lang_submit}">
+	<input name="cmd" type="hidden" value="menuconfig"{xhtml}>
+	<input name="action" type="hidden" value="{action}"{xhtml}>
+	<input name="menu_id" type="hidden" value="{menu_id}"{xhtml}>
+	<input name="submit" type="submit" value="{lang_submit}"{xhtml}>
 	{delete_button}
 </form>

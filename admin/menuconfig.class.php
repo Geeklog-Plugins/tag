@@ -30,20 +30,22 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-//
-// $Id$
 
 require_once '../../../lib-common.php';
 
-// Only let admin users access this page
+/**
+* Only let admin users access this page
+*/
 if (!SEC_hasRights('tag.admin')) {
-    // Someone is trying to illegally access this page
+    /**
+	* Someone is trying to illegally access this page
+	*/
     COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
-    $display  = COM_siteHeader();
-    $display .= COM_startBlock($LANG_TAG['access_denied']);
-    $display .= $LANG_TAG['access_denied_msg'];
-    $display .= COM_endBlock();
-    $display .= COM_siteFooter(true);
+    $display = COM_siteHeader()
+			 . COM_startBlock(TAG_str('access_denied'))
+			 . TAG_str('access_denied_msg')
+			 . COM_endBlock()
+			 . COM_siteFooter();
     echo $display;
     exit;
 }
@@ -51,7 +53,6 @@ if (!SEC_hasRights('tag.admin')) {
 /**
 * Main 
 */
-
 class TagMenuconfig
 {
 	var $menuList;
@@ -157,7 +158,7 @@ class TagMenuconfig
 	function _getIdList($menu_tags) {
 		$retval = array();
 		
-		if (is_array($menu_tags) AND count($menu_tags) > 0) {
+		if (is_array($menu_tags) AND (count($menu_tags) > 0)) {
 			foreach ($menu_tags as $menu_tag) {
 				$tag_id = array_search($menu_tag, $this->tagList);
 				if ($tag_id !== false) {
@@ -186,9 +187,9 @@ class TagMenuconfig
 			$A = DB_fetchArray($result);
 		} else {
 			$A = array(
-				'menu_id' => 0,
+				'menu_id'   => 0,
 				'menu_name' => '',
-				'tag_ids' => '',
+				'tag_ids'   => '',
 				'parent_id' => $parent_id,
 				'dsp_order' => 0
 			);
@@ -245,7 +246,7 @@ class TagMenuconfig
 		$A = DB_fetchArray($result);
 		$lang_vars = array(
 			'desc_delete_menu', 'menu_name', 'menu_parent', 'menu_tags',
-			'submit', 'cancel'
+			'submit', 'cancel',
 		);
 		
 		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
@@ -544,4 +545,3 @@ class TagMenuconfig
 		return false;
 	}
 }
-?>

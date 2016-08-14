@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta http-equiv="Content-Style-Type" content="text/css">
-	<title>Geeklog tag プラグインのインストール/アンインストール</title>
+	<title>Geeklog タグプラグインのインストール/アンインストール</title>
 	<style type="text/css">
 	<!-->
 		body {
@@ -50,6 +50,12 @@
 		li {
 			padding: 5px 5px 10px 5px;
 		}
+		#copyright {
+			padding: 0.5em;
+			border: solid 1px aqua;
+			background-color: #ccffff;
+			font-style: italic;
+		}
 		.fix {
 			color: white;
 			background-color: red;
@@ -65,16 +71,16 @@
 </head>
 
 <body>
-	<h1>Geeklog tag プラグインのインストール/アンインストール</h1>
+	<h1>Geeklog タグプラグインのインストール/アンインストール</h1>
 
 	<table>
 		<tr>
 			<th>プラグイン名</th>
-			<td>Tagプラグイン</td>
+			<td>タグプラグイン</td>
 		</tr>
 		<tr>
 			<th>バージョン</th>
-			<td>0.3.2</td>
+			<td>0.4.0</td>
 		</tr>
 		<tr>
 			<th>作者</th>
@@ -88,7 +94,7 @@
 	
 	<h2>概要</h2>
 	
-	<p>Tagプラグインを使用すると，記事にタグをつけて簡単に分類できるようになります。</p>
+	<p>タグプラグインを使用すると，記事にタグをつけて簡単に分類できるようになります。</p>
 	
 	<h2>インストール</h2>
 	
@@ -101,19 +107,19 @@
 	<p>を表しています。</p>
 
 	<ol>
-		<li>tag プラグインはテーブルを追加するので，管理者メニューの「DBのバックアップ」やphpMyAdminを使用して，事前にGeeklogのデータベースをバックアップしておきます。</li>
-		<li>tagプラグインのアーカイブを<span class="geeklog">&lt;geeklog_dir&gt;</span>/pluginsディレクトリに展開します。tagという名前のディレクトリができます。</li>
+		<li>タグプラグインはテーブルを追加するので，管理者メニューの「DBのバックアップ」やphpMyAdminを使用して，事前にGeeklogのデータベースをバックアップしておきます。</li>
+		<li>タグプラグインのアーカイブを<span class="geeklog">&lt;geeklog_dir&gt;</span>/pluginsディレクトリに展開します。tagという名前のディレクトリができます。</li>
 		<li>public_htmlディレクトリとadminディレクトリを作ります。htmlファイルを納めるディレクトリ（普通は <span class="public">&lt;public_html&gt;</span>）の下に，tagという名前のディレクトリを作ります。<span class="admin">&lt;admin&gt;</span>/plugins/ ディレクトリの下にも tagという名前のディレクトリを作ります。</li>
 		<li><span class="geeklog">&lt;geeklog_dir&gt;</span>/plugins/tag/ ディレクトリに移動します。adminディレクトリの内容を，3.で作成した <span class="admin">&lt;admin&gt;</span>/plugins/tag/ ディレクトリにコピーします。public_htmlディレクトリの内容を，3.で作成した <span class="public">&lt;public_html&gt;</span>/tag/ ディレクトリにコピーします。</li>
-		<li>tagディレクトリの config.php ファイルを編集し，データベースのテーブルのプレフィックスとゲストユーザーのアクセス権，表示設定などを確認します。デフォルトでは，Geeklogのテーブルのプレフィックスを使用し，ゲストユーザーのアクセスを認めないようになっています。</li>
-		<li>Rootユーザーとしてログインし，プラグインエディタからインストールを実行します。失敗した場合には，エラーログ（error.log）を調べます。この時点で，tag プラグインはインストールされ，機能しているはずです。tag アイコンをクリックすると，管理機能ページへジャンプするでしょう。</li>
-		<li>セキュリティを設定します。インストール直後には，tagプラグインの管理権限を持っているのは，Rootユーザーだけです。ユーザーエディタやグループエディタを使用して，管理権限を他の人やグループに委譲することができます</li>
+		<li>tagディレクトリの config.php ファイルを編集し，データベースのテーブルのプレフィックスとゲストユーザのアクセス権，表示設定などを確認します。デフォルトでは，Geeklogのテーブルのプレフィックスを使用し，ゲストユーザのアクセスを認めないようになっています。</li>
+		<li>Rootユーザとしてログインし，プラグインエディタからインストールを実行します。失敗した場合には，エラーログ（error.log）を調べます。この時点で，タグプラグインはインストールされ，機能しているはずです。tag アイコンをクリックすると，管理機能ページへジャンプするでしょう。</li>
+		<li>セキュリティを設定します。インストール直後には，タグプラグインの管理権限を持っているのは，Rootユーザだけです。ユーザエディタやグループエディタを使用して，管理権限を他の人やグループに委譲することができます</li>
 	</ol>
 
 	<h2>アンインストール</h2>
 
 	<ol>
-		<li>プラグインエディタから，tag プラグインをアンインストールします。このとき，tagプラグインが使用していたテーブルは破棄され，その中に記録されていたデータも削除されます。</li>
+		<li>プラグインエディタから，タグプラグインをアンインストールします。このとき，タグプラグインが使用していたテーブルは破棄され，その中に記録されていたデータも削除されます。</li>
 		<li>インストールの過程で作成した3つのディレクトリ（<span class="geeklog">&lt;geeklog-dir&gt;</span>/plugins/tag/ <span class="public">&lt;public_html&gt;</span>/tag/ and <span class="admin">&lt;admin&gt;</span>/plugins/tag/ を削除します。</li>
 	</ol>
 	
@@ -130,7 +136,7 @@
 	
 	<h2>&lt;geeklog&gt;/plugins/tag/config.phpの編集による設定</h2>
 	
-	<p>上記ファイルを編集することで，tagプラグインの動作を変更することができます。利用可能なオプションは次の通りです。</p>
+	<p>上記ファイルを編集することで，タグプラグインの動作を変更することができます。利用可能なオプションは次の通りです。</p>
 	<table>
 		<caption>[オプション]</caption>
 		<tr>
@@ -141,7 +147,7 @@
 		<tr>
 			<td>$_TAG_CONF['default_block_name']</td>
 			<td>'tag_cloud_block'</td>
-			<td>インストール時に作成されるタグクラウドブロックの名前。Geeklog-1.4.1以降を使っている場合，tagプラグインの有効/無効と連動して表示/非表示にされる。</td>
+			<td>インストール時に作成されるタグクラウドブロックの名前。Geeklog-1.4.1以降を使っている場合，タグプラグインの有効/無効と連動して表示/非表示にされる。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_name']</td>
@@ -156,7 +162,7 @@
 		<tr>
 			<td>$_TAG_CONF['tag_case_sensitive']</td>
 			<td>false</td>
-			<td>trueにすると，たとえば，Geeklog というタグは geeklog というタグと違うものと見なされます。このオプションを変更した場合は，Tagプラグインをインストールし直してください。</td>
+			<td>trueにすると，たとえば，Geeklog というタグは geeklog というタグと違うものと見なされます。このオプションを変更した場合は，タグプラグインをインストールし直してください。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_stemming']</td>
@@ -234,6 +240,13 @@
 			<th>説明</th>
 		</tr>
 		<tr>
+			<td class="center">0.4.0</td>
+			<td class="center">2008-08-12</td>
+			<td>
+				<span class="fix">修正</span> Geeklog-1.5.0でも動作するように更新しました。Geeklog-1.5.0では、コンフィギュレーションで設定できるようになりました。
+			</td>
+		</tr>
+		<tr>
 			<td class="center">0.3.2</td>
 			<td class="center">2008-02-28</td>
 			<td>
@@ -264,7 +277,7 @@
 		<tr>
 			<td class="center">0.2.0</td>
 			<td class="center">2008-01-14</td>
-			<td><span class="fix">修正</span> URLリライトがオフのとき，タグクラウドの下に表示されていた記事へのリンクが間違って生成されていた問題に対応しました。<br><span class="new">New!</span> Tagプラグインをインストールし直すときに，記事に含まれている[tag:foo]タグを自動的に登録する処理を追加しました。<br><span class="new">New!</span> 間違って登録したタグをコントロールパネルから削除する機能を追加しました。<br><span class="new">New!</span> インストール時にタグクラウドブロックを自動的に作成するようにしました。</td>
+			<td><span class="fix">修正</span> URLリライトがオフのとき，タグクラウドの下に表示されていた記事へのリンクが間違って生成されていた問題に対応しました。<br><span class="new">New!</span> タグプラグインをインストールし直すときに，記事に含まれている[tag:foo]タグを自動的に登録する処理を追加しました。<br><span class="new">New!</span> 間違って登録したタグをコントロールパネルから削除する機能を追加しました。<br><span class="new">New!</span> インストール時にタグクラウドブロックを自動的に作成するようにしました。</td>
 		</tr>
 		<tr>
 			<td class="center">0.1.0</td>
@@ -272,6 +285,7 @@
 			<td>初期バージョン</td>
 		</tr>
 	</table>
-
+	
+	<p id="copyright">Copyright &copy; 2006-2008 mystral-kk</p>
 </body>
 </html>

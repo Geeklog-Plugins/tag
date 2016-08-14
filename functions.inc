@@ -30,8 +30,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-//
-// $Id$
 
 /**
 * Language file Include
@@ -48,6 +46,10 @@ if (file_exists($langfile)) {
 * Include tag config file
 */
 require_once $_CONF['path'] . 'plugins/tag/config.php';
+
+if (version_compare(VERSION, '1.5') >= 0) {	// for GL-1.5 +
+    define('TAG_GL15', true);
+}
 
 /**
 * Include Porter Stemmer
@@ -176,8 +178,20 @@ function plugin_upgrade_tag() {
 			/* Fall through into the next case */
 		
 		case '0.3.0':	// 0.3.0 --> 0.3.1
+		case '0.3.1':
+		case '0.3.2':
+		    /**
+		    * If the version of Tag plugin is lower than 0.4.0 AND Geeklog version
+			* is 1.5 or newer, then save config values into DB with config.class.php.
+		    */
+		    if ((version_compare($pi_version, '0.4.0') < 0)
+			 AND (version_compare(VERSION, '1.5') >= 0)) {
+		        require_once $_CONF['path'] . 'plugins/themedit/install_defaults.php';
+		        plugin_initconfig_tag();
+		    }
+			
 			break;
-		
+			
 		default:
 			break;
 	}
@@ -205,7 +219,7 @@ function plugin_upgrade_tag() {
 *
 */  
 function plugin_uninstall_tag($installCheck = '') {
-    global $_TABLES, $_TAG_CONF, $LANG_TAG;
+    global $_CONF, $_TABLES, $_TAG_CONF, $LANG_TAG;
 
     // $FEATURES and $TABLES have to be changed accodrding to your plugin
     $pi_name  = 'tag';
@@ -258,7 +272,32 @@ function plugin_uninstall_tag($installCheck = '') {
         DB_query("DELETE FROM {$_TABLES['access']} WHERE acc_ft_id = $feat_id", 1);
         DB_query("DELETE FROM {$_TABLES['features']} WHERE ft_id = $feat_id", 1);
     }
+	
+    /**
+    * Delete config info
+    */
+    if (defined('TAG_GL15')) {
+        require_once $_CONF['path_system'] . 'classes/config.class.php';
         
+        $config = config::get_instance();
+        if ($config->group_exists('tag')) {
+            $param_names = array(
+				'sg_main', 'fs_main',
+				'default_block_name', 'tag_name', 'max_tag_len',
+				'tag_case_sensitive', 'tag_stemming', 'tag_check_badword',
+				'tag_cloud_spacer', 'max_tag_cloud', 'max_tag_cloud_in_block',
+				'tag_cloud_threshold', 'replace_underscore', 'num_keywords',
+				'publish_as_template_vars', 'template_vars',
+				'default_block_name_menu', 'menu_indenter',
+				'add_num_items_to_menu',
+            );
+            
+            foreach ($param_names as $param_name) {
+                $config->del($param_name, 'tag');
+            }
+        }
+    }
+	
     COM_errorLog('...success', 1);
     return true;
 }
@@ -306,16 +345,20 @@ if (!function_exists('COM_getCharset')) {
 	*/
 	function COM_getCharset() {
 		global $_CONF, $LANG_CHARSET;
-
-		if (empty($LANG_CHARSET)) {
-			$charset = $_CONF['default_charset'];
-			if (empty($charset)) {
-				$charset = 'iso-8859-1';
+		
+		static $charset = null;
+		
+		if ($charset === NULL) {
+			if (empty($LANG_CHARSET)) {
+				$charset = $_CONF['default_charset'];
+				if (empty($charset)) {
+					$charset = 'iso-8859-1';
+				}
+			} else {
+				$charset = $LANG_CHARSET;
 			}
-		} else {
-			$charset = $LANG_CHARSET;
 		}
-
+		
 		return $charset;
 	}
 }
@@ -506,6 +549,9 @@ function TAG_split($str) {
 	$pattern = preg_quote($LANG_TAG['tag_separators']);
 	$pattern = '[' . $pattern . ']+';
 	if (function_exists('mb_split')) {
+		if (function_exists('mb_regex_encoding')) {
+			mb_regex_encoding(COM_getCharset());
+		}
 		$retval = mb_split($pattern, $str);
 	} else {
 		$retval = split($pattern, $str);
@@ -525,6 +571,7 @@ function TAG_stem($str) {
 	
 	static $porterStemmer = null;
 	
+	$encoding = COM_getCharset();
 	if (!is_object($porterStemmer)) {
 		$porterStemmer = new PorterStemmer();
 	}
@@ -536,14 +583,14 @@ function TAG_stem($str) {
 		* Stem English part
 		*/
 		$i    = 0;
-		$len  = mb_strlen($str);
+		$len  = mb_strlen($str, $encoding);
 		$temp = $str;
 		$str  = '';
 		$word = '';
 		
 		while ($i < $len) {
-			$ch = mb_substr($temp, $i, 1);
-			if (mb_strwidth($ch) == 1) {
+			$ch = mb_substr($temp, $i, 1, $encoding);
+			if (mb_strwidth($ch, $encoding) == 1) {
 				$word .= $ch;
 			} else {
 				if ($word != '') {
@@ -573,18 +620,19 @@ function TAG_stem($str) {
 function TAG_normalize($str) {
 	global $_TAG_CONF;
 	
+	$encoding = COM_getCharset();
 	if (function_exists('mb_convert_kana')) {
 		/**
 		* Convert Zenkaku alphabet and number into Hankaku, and Hankaku Katakana
 		* into Zenkaku Katakana.  We distinguish between Hiragana and Katakana.
 		*/
-		$str = mb_convert_kana($str, 'aKV');
+		$str = mb_convert_kana($str, 'aKV', $encoding);
 		if ($_TAG_CONF['tag_case_sensitive'] === false) {
-			$str = mb_strtolower($str);
+			$str = mb_strtolower($str, $encoding);
 		}
 		
-		if (mb_strwidth($str) > $_TAG_CONF['max_tag_len']) {
-			$str = mb_strcut($str, 0, $_TAG_CONF['max_tag_len']);
+		if (mb_strwidth($str, $encoding) > $_TAG_CONF['max_tag_len']) {
+			$str = mb_strcut($str, 0, $_TAG_CONF['max_tag_len'], $encoding);
 		}
 	} else {
 		if ($_TAG_CONF['tag_case_sensitive'] === false) {
@@ -1071,7 +1119,7 @@ function TAG_checkBadword($word) {
 	}
 	
 	if (function_exists('mb_strtolower')) {
-		$word = mb_strtolower($word);
+		$word = mb_strtolower($word, COM_getCharset());
 	} else {
 		$word = strtolower($lower);
 	}
@@ -1362,5 +1410,3 @@ function phpblock_tag_menu() {
 	
 	return $retval;
 }
-
-?>

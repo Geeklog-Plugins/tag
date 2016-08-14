@@ -3,7 +3,7 @@
 // +---------------------------------------------------------------------------+
 // | Tag Plugin for Geeklog - The Ultimate Weblog                              |
 // +---------------------------------------------------------------------------|
-// | private/plugins/tag/language/japanese_utf-8.php                           |
+// | geeklog/plugins/tag/language/japanese_utf-8.php                           |
 // +---------------------------------------------------------------------------|
 // | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
 // |                                                                           |
@@ -29,22 +29,20 @@
 // | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA|
 // |                                                                           |
 // +---------------------------------------------------------------------------|
-//
-// $Id$
 
 $LANG_CHARSET = 'utf-8';
 
 $LANG_TAG = array (
-    'plugin'            => 'tagプラグイン',
+    'plugin'            => 'タグプラグイン',
 	'access_denied'     => 'アクセスは拒否されました。',
 	'access_denied_msg' => 'このページにアクセスできるのは，Rootユーザだけです。あなたのユーザ名とIPアドレスは記録されました。',
-	'admin'		        => 'tagプラグイン管理',
-	'install_header'	=> 'tagプラグインのインストール/アンインストール',
-	'install_success'	=> 'tagプラグインのインストールに成功しました。',
-	'install_fail'  	=> 'tagプラグインのインストールに失敗しました。詳細はエラーログ(error.log)をご覧ください。',
-	'uninstall_success'	=> 'tagプラグインのアンインストールに成功しました。',
-	'uninstall_fail'    => 'tagプラグインのアンインストールに失敗しました。詳細はエラーログ(error.log)をご覧ください。',
-	'uninstall_msg'		=> 'tagプラグインはアンインストールされました。',
+	'admin'		        => 'タグプラグイン管理',
+	'install_header'	=> 'タグプラグインのインストール/アンインストール',
+	'install_success'	=> 'タグプラグインのインストールに成功しました。',
+	'install_fail'  	=> 'タグプラグインのインストールに失敗しました。詳細はエラーログ(error.log)をご覧ください。',
+	'uninstall_success'	=> 'タグプラグインのアンインストールに成功しました。',
+	'uninstall_fail'    => 'タグプラグインのアンインストールに失敗しました。詳細はエラーログ(error.log)をご覧ください。',
+	'uninstall_msg'		=> 'タグプラグインはアンインストールされました。',
 	'tag_separators'    => ' 　',	// 2文字以上も可
 	'badword_replace'   => '',
 	'admin_label'       => 'タグ',
@@ -98,4 +96,44 @@ $LANG_TAG = array (
 	'no_item'           => '該当するアイテムはありません。',
 );
 
-?>
+// Localization of the Admin Configuration UI
+$LANG_configsections['tag'] = array(
+    'label' => 'タグプラグイン',
+    'title' => 'タグプラグインの設定'
+);
+
+/**
+* For Config UI
+*/
+$LANG_confignames['tag'] = array(
+	'default_block_name'       => 'タグクラウドブロック名の初期値',
+	'tag_name'                 => 'タグの識別子',
+	'max_tag_len'              => 'タグの長さの最大値（単位：バイト）',
+	'tag_case_sensitive'       => 'タグの大文字小文字を区別する',
+    'tag_stemming'             => 'タグの語尾正規化を行う',
+	'tag_check_badword'        => 'バッドワードリストを使用する',
+	'tag_cloud_spacer'         => 'タグクラウドのスペーサ',
+	'max_tag_cloud'            => 'タグクラウドに表示されるタグの最大数',
+	'max_tag_cloud_in_block'   => 'タグクラウドブロックに表示されるタグの最大数',
+	'tag_cloud_threshold'      => 'タグレベルの上限値',
+	'replace_underscore'       => 'タグのアンダースコアをスペースに置換して表示',
+	'num_keywords'             => 'keywordsタグに表示するキーワード数の上限',
+	'publish_as_template_vars' => 'タグをテンプレート変数として出力',
+	'default_block_name_menu'  => 'タグメニューブロック名の初期値',
+	'menu_indenter'            => 'タグメニューをインデントする文字列',
+	'add_num_items_to_menu'    => 'タグメニューでアイテム数を表示',
+	
+);
+
+$LANG_configsubgroups['tag'] = array(
+    'sg_main' => 'メイン'
+);
+
+$LANG_fs['tag'] = array(
+    'fs_main'   => 'タグプラグインのメイン設定',
+);
+
+// Note: entries 0, 1, 9, and 12 are the same as in $LANG_configselects['Core']
+$LANG_configselects['tag'] = array(
+    0 => array('はい' => true, 'いいえ' => false),
+);

@@ -429,5 +429,3 @@ class PorterStemmer
 			   AND $matches[1]{2} != 'y';
 	}
 }
-
-?>

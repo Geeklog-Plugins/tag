@@ -30,8 +30,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // |                                                                           |
 // +---------------------------------------------------------------------------+
-//
-// $Id$
 
 require_once '../lib-common.php';
 
@@ -39,7 +37,9 @@ if (!defined('XHTML')) {
 	define('XHTML', '');
 }
 
-// Retrieve request vars
+/**
+* Retrieve request vars
+*/
 COM_setArgNames(array('tag'));
 $tag  = COM_getArgument('tag');
 $tags = explode('_', COM_applyFilter($tag));
@@ -48,13 +48,17 @@ if (count($tags) == 0) {
 	exit;
 }
 
-// Display
+/**
+* Display
+*/
 $display = COM_siteHeader();
 $T = new Template($_CONF['path'] . 'plugins/tag/templates');
 $T->set_file('page', 'menu.thtml');
 $T->set_var('xhtml', XHTML);
 
-// Lang vars
+/**
+* Lang vars
+*/
 $lang_vars = array('tag_list');
 
 foreach ($lang_vars as $lang_var) {
@@ -77,8 +81,9 @@ if (!DB_error()) {
 		switch ($A['type']) {
 			case 'article':
 				/* Fall through to default */
+			
 			default:
-				$url = COM_buildURL($_CONF['site_url'] . '/article.php?sid=' . TAG_escape($A['sid']));
+				$url = COM_buildURL($_CONF['site_url'] . '/article.php?story=' . TAG_escape($A['sid']));
 				$title = TAG_getStoryTitle($A['sid']);
 				break;
 		}
@@ -125,5 +130,3 @@ $T->parse('output', 'page');
 $display .= $T->finish($T->get_var('output'))
 		 .  COM_siteFooter();
 echo $display;
-
-?>

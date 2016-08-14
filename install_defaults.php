@@ -31,7 +31,7 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------+
 
-global $_DB_table_prefix, $_TABLES;
+global $_DB_table_prefix, $_TABLES, $_TAG_DEFAULT;
 
 // set Plugin Table Prefix the Same as Geeklogs
 
@@ -44,13 +44,13 @@ $_TABLES['tag_map']       = $_TAG_table_prefix . 'tag_map';
 $_TABLES['tag_badwords']  = $_TAG_table_prefix . 'tag_badwords';
 $_TABLES['tag_menu']      = $_TAG_table_prefix . 'tag_menu';
 
-$_TAG_CONF = array();
+$_TAG_DEFAULT = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version'] = '0.4.0';						// Plugin Version
-$_TAG_CONF['gl_version'] = '1.4.0';						// GL Version plugin for
-$_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
+$_TAG_DEFAULT['pi_version'] = '0.3.2';						// Plugin Version
+$_TAG_DEFAULT['gl_version'] = '1.4.0';						// GL Version plugin for
+$_TAG_DEFAULT['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 
 //=========================================================
 //  DO NOT CHANGE ANYTHING ABOVE THIS LINE
@@ -63,27 +63,27 @@ $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 /**
 * Default name of a tag cloud block which will be created during the
 * installation.  If you use Geeklog-1.4.1 or later and disable/enable the tag
-* plugin, the block named $_TAG_CONF['default_block_name'] will also
+* plugin, the block named $_TAG_DEFAULT['default_block_name'] will also
 * be disabled/enabled automatically.
 */
-$_TAG_CONF['default_block_name'] = 'tag_cloud_block';
+$_TAG_DEFAULT['default_block_name'] = 'tag_cloud_block';
 
 /**
 * Tag name to be used in items (articles), like '[tag:foo]'.  You might prefer
 * a shorter name like '[t:foo]'.
 */
-$_TAG_CONF['tag_name'] = 'tag';
+$_TAG_DEFAULT['tag_name'] = 'tag';
 
 /**
 * Max length of a tag in bytes.  Should not be longer than 255.
 */
-$_TAG_CONF['max_tag_len'] = 60;
+$_TAG_DEFAULT['max_tag_len'] = 60;
 
 /**
 * If this is true, the tag "Geeklog" will NOT be identified with the tag
 * "geeklog".
 */
-$_TAG_CONF['tag_case_sensitive'] = false;
+$_TAG_DEFAULT['tag_case_sensitive'] = false;
 
 /**
 * If this is true, each tag consisting only of alphabets will be stemmed.  For
@@ -92,60 +92,60 @@ $_TAG_CONF['tag_case_sensitive'] = false;
 *
 * @WARNING: The stemming feature is still not perfect.  For example, 'Firefox'
 *           is stemmed into 'Firefoxi'.  So, I don't recommend you set
-*           $_TAG_CONF['tag_stemming'] to true for the time being.
+*           $_TAG_DEFAULT['tag_stemming'] to true for the time being.
 */
-$_TAG_CONF['tag_stemming'] = false;
+$_TAG_DEFAULT['tag_stemming'] = false;
 
 /**
 * Whether to use a list of bad words.  If a tag is regarded as bad, it will be
 * replaced with $LANG_TAG['badword_replace'] automatically.
 */
-$_TAG_CONF['tag_check_badword'] = true;
+$_TAG_DEFAULT['tag_check_badword'] = true;
 
 /**
 * A string to be used as a spacer in displaying tag clouds
 */
-$_TAG_CONF['tag_cloud_spacer'] = '  ';
+$_TAG_DEFAULT['tag_cloud_spacer'] = '  ';
 
 /**
 * Max number of tags to be displayed in tag clouds in public_html/tag/index.php
 */
-$_TAG_CONF['max_tag_cloud'] = 30;
+$_TAG_DEFAULT['max_tag_cloud'] = 30;
 
 /**
 * Max number of tags to be displayed in tag clouds in side block
 */
-$_TAG_CONF['max_tag_cloud_in_block'] = 20;
+$_TAG_DEFAULT['max_tag_cloud_in_block'] = 20;
 
 /**
 * Thresholds of frequency of each tag cloud level
 *
 * All tag clouds are classified in 10 levels (level 0..level 9).  Those tags
-* whose number is equal to or smaller than $_TAG_CONF['tag_cloud_threshold'][x]
+* whose number is equal to or smaller than $_TAG_DEFAULT['tag_cloud_threshold'][x]
 * belong to level x.  Each level corresponds to its own class in CSS(Cascading
 * Style Sheet), so you can display in different styles tags according to their
 * levels.
 */
-$_TAG_CONF['tag_cloud_threshold'][0]  = 1;
-$_TAG_CONF['tag_cloud_threshold'][1]  = 2;
-$_TAG_CONF['tag_cloud_threshold'][2]  = 3;
-$_TAG_CONF['tag_cloud_threshold'][3]  = 4;
-$_TAG_CONF['tag_cloud_threshold'][4]  = 5;
-$_TAG_CONF['tag_cloud_threshold'][5]  = 6;
-$_TAG_CONF['tag_cloud_threshold'][6]  = 7;
-$_TAG_CONF['tag_cloud_threshold'][7]  = 8;
-$_TAG_CONF['tag_cloud_threshold'][8]  = 9;
+$_TAG_DEFAULT['tag_cloud_threshold'][0]  = 1;
+$_TAG_DEFAULT['tag_cloud_threshold'][1]  = 2;
+$_TAG_DEFAULT['tag_cloud_threshold'][2]  = 3;
+$_TAG_DEFAULT['tag_cloud_threshold'][3]  = 4;
+$_TAG_DEFAULT['tag_cloud_threshold'][4]  = 5;
+$_TAG_DEFAULT['tag_cloud_threshold'][5]  = 6;
+$_TAG_DEFAULT['tag_cloud_threshold'][6]  = 7;
+$_TAG_DEFAULT['tag_cloud_threshold'][7]  = 8;
+$_TAG_DEFAULT['tag_cloud_threshold'][8]  = 9;
 
 /**
 * Whether to replace an underscore included in tag texts with a space
 */
-$_TAG_CONF['replace_underscore'] = false;
+$_TAG_DEFAULT['replace_underscore'] = false;
 
 /**
 * The number of key words to be included in <meta name="keywords"
 * content="foo,bar"> tag
 */
-$_TAG_CONF['num_keywords'] = 0;
+$_TAG_DEFAULT['num_keywords'] = 0;
 
 /**
 * Whether to publish tags as template vars which can be used in
@@ -154,12 +154,12 @@ $_TAG_CONF['num_keywords'] = 0;
 *
 * CAUTION: This feature is valid for Geeklog-1.4.1 or later.
 */
-$_TAG_CONF['publish_as_template_vars'] = false;
+$_TAG_DEFAULT['publish_as_template_vars'] = false;
 
 /**
 * This is work vars and should be left untouched by users
 */
-$_TAG_CONF['template_vars'] = array();
+$_TAG_DEFAULT['template_vars'] = array();
 
 /**
 * Configurations for tag menu (Tag-0.3.0 or later)
@@ -168,38 +168,65 @@ $_TAG_CONF['template_vars'] = array();
 /**
 * Default name of a tag menu block which will be created during the
 * installation.  If you use Geeklog-1.4.1 or later and disable/enable the tag
-* plugin, the block named $_TAG_CONF['default_block_name'] will also
+* plugin, the block named $_TAG_DEFAULT['default_block_name'] will also
 * be disabled/enabled automatically.
 */
-$_TAG_CONF['default_block_name_menu'] = 'tag_menu_block';
+$_TAG_DEFAULT['default_block_name_menu'] = 'tag_menu_block';
 
 /**
 * Character(s) for indenting tag menu item
 */
-$_TAG_CONF['menu_indenter'] = '&nbsp;&nbsp;&nbsp;';
+$_TAG_DEFAULT['menu_indenter'] = '&nbsp;&nbsp;&nbsp;';
 
 /**
 * Whether to add the number of items to each tag menu item
 *
 * @note This feature could be a costly operation
 */
-$_TAG_CONF['add_num_items_to_menu'] = false;
-
-//===============================================
-// For GL-1.5.0+
-//===============================================
+$_TAG_DEFAULT['add_num_items_to_menu'] = false;
 
 /**
-* Check and see if we need to load the plugin configuration
+* Initialize Tag plugin configuration
+*
+* Creates the database entries for the configuation if they don't already exist.
+* Initial values will be taken from $_TAG_CONF if available (e.g. from an old
+* config.php), uses $_TAG_CONF otherwise.
+*
+* @return   boolean     true: success; false: an error occurred
 */
-if (version_compare(VERSION, '1.5') >= 0) {
-    require_once $_CONF['path_system'] . 'classes/config.class.php';
+function plugin_initconfig_tag() {
+    global $_TAG_CONF, $_TAG_DEFAULT;
     
-    $conf = config::get_instance();
-    if ($conf->group_exists('tag')) {
-        $temp = $conf->get_config('tag');
-        if (is_array($temp) AND (count($temp) >= 1)) {
-            $_TAG_CONF = array_merge($_TAG_CONF, $temp);
-        }
+    if (isset($_TAG_CONF) AND is_array($_TAG_CONF)
+     AND (count($_TAG_CONF) >= 1)) {
+        $_TAG_DEFAULT = array_merge($_TAG_DEFAULT, $_TAG_CONF);
     }
+    
+    $c = config::get_instance();
+    if (!$c->group_exists('tag')) {
+        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true, 'tag');
+        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, 0, true, 'tag');
+        
+        /**
+        * Main
+        */
+        $c->add('default_block_name', $_TAG_DEFAULT['default_block_name'], 'text', 0, 0, NULL, 10, true, 'tag');
+        $c->add('tag_name', $_TAG_DEFAULT['tag_name'], 'text', 0, 0, NULL, 20, true, 'tag');
+        $c->add('max_tag_len', $_TAG_DEFAULT['max_tag_len'], 'text', 0, 0, null, 30, true, 'tag');
+        $c->add('tag_case_sensitive', $_TAG_DEFAULT['tag_case_sensitive'], 'select', 0, 0, 0, 40, true, 'tag');
+        $c->add('tag_stemming', $_TAG_DEFAULT['tag_stemming'], 'select', 0, 0, 0, 50, true, 'tag');
+        $c->add('tag_check_badword', $_TAG_DEFAULT['tag_check_badword'], 'select', 0, 0, 0, 60, true, 'tag');
+        $c->add('tag_cloud_spacer', $_TAG_DEFAULT['tag_cloud_spacer'], 'text', 0, 0, null, 70, true, 'tag');
+        $c->add('max_tag_cloud', $_TAG_DEFAULT['max_tag_cloud'], 'text', 0, 0, null, 80, true, 'tag');
+        $c->add('max_tag_cloud_in_block', $_TAG_DEFAULT['max_tag_cloud_in_block'], 'text', 0, 0, null, 90, true, 'tag');
+        $c->add('tag_cloud_threshold', $_TAG_DEFAULT['tag_cloud_threshold'], '%text', 0, 0, null, 100, true, 'tag');
+        $c->add('replace_underscore', $_TAG_DEFAULT['replace_underscore'], 'select', 0, 0, 0, 110, true, 'tag');
+        $c->add('num_keywords', $_TAG_DEFAULT['num_keywords'], 'text', 0, 0, NULL, 110, true, 'tag');
+        $c->add('publish_as_template_vars', $_TAG_DEFAULT['publish_as_template_vars'], 'select', 0, 0, 0, 120, true, 'tag');
+        $c->add('default_block_name_menu', $_TAG_DEFAULT['default_block_name_menu'], 'text', 0, 0, NULL, 130, true, 'tag');
+        $c->add('menu_indenter', $_TAG_DEFAULT['menu_indenter'], 'text', 0, 0, NULL, 140, true, 'tag');
+        $c->add('add_num_items_to_menu', $_TAG_DEFAULT['add_num_items_to_menu'], 'select', 0, 0, 0, 140, true, 'tag');
+    }
+    
+    return true;
 }
