@@ -74,45 +74,42 @@ class TagBadword
 	{
 		global $_CONF, $_TABLES;
 		
-		$retval = '<form method="post" action="' . $_CONF['site_admin_url']
-				. '/plugins/tag/index.php' . '">' . LB
-				. '<input name="cmd" type="hidden" value="badword">' . LB
-				. '<input name="action" type="hidden" value="doAdd">' . LB
-				. '<p>' . TAG_str('add') . ':&nbsp;<input name="word" type="text">'
-				. '<input name="submit" type="submit" value="' . TAG_str('submit')
-				. '"></p>'
-				. '</form>' . LB;
+		$body = '';
+		$display = COM_siteHeader();
+		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
+		$T->set_file('badword', 'admin_badword.thtml');
+		$T->set_var('xhtml', XHTML);
+		$T->set_var(
+			'this_script',
+			COM_buildURL($_CONF['site_admin_url'] . '/plugins/tag/index.php')
+		);
+		$T->set_var('lang_desc_admin_badword', TAG_str('desc_admin_badword'));
+		$T->set_var('lang_add', TAG_str('add'));
+		$T->set_var('lang_lbl_tag', TAG_str('lbl_tag'));
+		$T->set_var('lang_delete_checked', TAG_str('delete_checked'));
 		
 		$sql = "SELECT * FROM {$_TABLES['tag_badwords']}";
 		$result = DB_query($sql);
 		if (DB_error()) {
 			return $retval . '<p>' . TAG_str('db_error') . '</p>';
 		} else if (DB_numRows($result) == 0) {
-			return $retval . '<p>' . TAG_str('no_badword') . '</p>';
+			$T->set_var('msg', '<p>' . TAG_str('no_badword') . '</p>');
+		} else {
+			$sw = 1;
+			
+			while (($A = DB_fetchArray($result)) !== false) {
+				$word = TAG_escape($A['badword']);
+				$body .= '<tr><td>'
+					  .  '<input id="' . $word . '" name="words[]" type="checkbox" '
+					  .  'value="' . $word . '"><label for="' . $word . '">'
+					  .  $word . '</label></td></tr>' . LB;
+				$sw = ($sw == 1) ? 2 : 1;
+			}
 		}
-		
-		$retval .= '<form method="post" action="' . $_CONF['site_admin_url']
-				.  '/plugins/tag/index.php' . '">' . LB
-				.  '<input name="cmd" type="hidden" value="badword">' . LB
-				.  '<input name="action" type="hidden" value="doDelete">' . LB;
-
-		$sw = 1;
-		$retval .= '<table class="plugin">' . LB
-				.  '<tr><th>' . TAG_str('check') . '</th><th>' . TAG_str('badword')
-				.  '</th></tr>' . LB;
-		
-		while (($A = DB_fetchArray($result)) !== false) {
-			$word = TAG_escape($A['badword']);
-			$retval .= '<tr><td>'
-					.  '<input name="words[]" type="checkbox" value="' . $word
-					. '"></td><td>' . $word . '</td></tr>' . LB;
-			$sw = ($sw == 1) ? 2 : 1;
-		}
-		
-		$retval .= '</table>' . LB
-				.  '<input name="submit" type="submit" value="'
-				.  TAG_str('delete_checked') . '">' . LB
-				.  '</form>' . LB;
+				
+		$T->set_var('body', $body);
+		$T->parse('output', 'badword');
+		$retval = $T->finish($T->get_var('output'));
 		
 		return $retval;
 	}
@@ -121,10 +118,24 @@ class TagBadword
 	{
 		global $_TABLES;
 		
+		// Add a bad word into DB
 		$word = TAG_post('word');
 		$sql = "INSERT INTO {$_TABLES['tag_badwords']} (badword) "
 			 . "VALUES ('" . addslashes($word) . "')";
 		$result = DB_query($sql);
+		
+		// Delete the bad word from list and map if it already exists
+		$tag_id = TAG_getTagId($word);
+		if ($tag_id !== false) {
+			$sql = "DELETE FROM {$_TABLES['tag_list']} "
+				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
+			DB_query($sql);
+			
+			$sql = "DELETE FROM {$_TABLES['tag_map']} "
+				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
+			DB_query($sql);
+		}
+		
 		return DB_error() ? TAG_str('add_fail') : TAG_str('add_success');
 	}
 	
@@ -134,15 +145,32 @@ class TagBadword
 	
 	function doDelete()
 	{
-		global $_TABLES;
+		global $_TABLES, $LANG_TAG;
+		
+		$submit = TAG_post('submit');
+		if ($submit == $LANG_TAG['add']) {
+			$this->doAdd();
+			return;
+		}
 		
 		$words = TAG_post('words');
-		$words = array_map('addslashes', $words);
-		$words = "('" . implode("','", $words) . "')";
+		if (count($words) == 0) {
+			return '';
+		}
+		
+		// Delete a bad word from DB
+		$words4db = array_map('addslashes', $words);
+		$words4db = "('" . implode("','", $words4db) . "')";
 		
 		$sql = "DELETE FROM {$_TABLES['tag_badwords']} "
-			 . "WHERE (badword IN " . $words . ")";
+			 . "WHERE (badword IN " . $words4db . ")";
 		$result = DB_query($sql);
+		
+		// Rescan articles for the unbanned bad word
+		foreach ($words as $tag) {
+			TAG_rescanTag($tag);
+		}
+		
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
 	}
 }

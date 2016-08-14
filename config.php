@@ -50,7 +50,7 @@ $_TAG_CONF = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version'] = '0.1.0';						// Plugin Version
+$_TAG_CONF['pi_version'] = '0.2.0';						// Plugin Version
 $_TAG_CONF['gl_version'] = '1.4.0';						// GL Version plugin for
 $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 
@@ -61,6 +61,14 @@ $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 /**
 * User Configurations
 */
+
+/**
+* Default name of a tag cloud block which will be created during the
+* installation.  If you use Geeklog-1.4.1 or later and disable/enable the tag
+* plugin, the block named $_TAG_CONF['default_block_name'] will also
+* be disabled/enabled automatically.
+*/
+$_TAG_CONF['default_block_name'] = 'tag_cloud_block';
 
 /**
 * Tag name to be used in items (articles), like '[tag:foo]'.  You might prefer

@@ -47,6 +47,16 @@
 		.center {
 			text-align: center;
 		}
+		.fix {
+			color: white;
+			background-color: red;
+			font-weight: bold;
+		}
+		.new {
+			color: white;
+			background-color: blue;
+			font-weight: bold;
+		}
 	<! -->
 	</style>
 </head>
@@ -61,7 +71,7 @@
 		</tr>
 		<tr>
 			<th>Version</th>
-			<td>0.1.0</td>
+			<td>0.2.0</td>
 		</tr>
 		<tr>
 			<th>Author</th>
@@ -105,11 +115,11 @@
 	
 	<h2>USAGE</h2>
 	
-	<p>When you are writing an article and want to put tags to it, just enter <code>[tag:your_favorite_tag]</code>in the article.  You can use multiple tags like this:<code>[tag:Geeklog plugins]</code>Each tag must be separated by a space.  By default, tags are case-insensitive.  For example, the tag "Geeklog" will be identified with "geeklog" or "GEEKLOG".</p>
+	<p>When you are writing an article and want to put tags to it, just enter <code>[tag:your_favorite_tag]</code>in the article.  You can use multiple tags like this:<code>[tag:Geeklog plugins]</code>Each tag must be separated by a space.  If you would like to register words as one tag, such as "Zend Framework", you should enter "Zend_Framework".  By default, tags are case-insensitive.  For example, the tag "Geeklog" will be identified with "geeklog" or "GEEKLOG".</p>
 	
 	<ul>
 		<li>If you want to ban certain tags, you can do so in the admin control panel.  Bad words are also case-insensitive.</li>
-		<li>If you would like to display "tag clouds" in your site block, just create a PHP block with the function name being <strong>phpblock_tag_cloud</strong>.</li>
+		<li>If you would like to display "tag clouds" in your site block, just create a PHP block with the function name being <strong>phpblock_tag_cloud</strong>.<br><strong>NOTE</strong>: Since version 0.2.0, a tag cloud block will be created automatically during installation.</li>
 		<li>The apperance of tag clouds are controlled with templates (in <span class="geeklog">&lt;geeklog&gt;</span>/plugins/tag/templates/) and Cascading Style Sheet (as <span class="public">&lt;public_html&gt;</span>/tag/tag.css).  In case <span class="public">&lt;public_html&gt;</span>/layout/your_theme/tag.css exists, this will be preferred over <span class="public">&lt;public_html&gt;</span>/tag/tag.css.</li>
 	</ul>
 	
@@ -122,6 +132,11 @@
 			<th>Var name</th>
 			<th>Default Value</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['default_block_name']</td>
+			<td>'tag_cloud_block'</td>
+			<td>The default name of tag block which will be created during the installation.  If you use Geeklog-1.4.1 or later and disable/enable the tag plugin, the block named $_TAG_CONF['default_block_name'] will also be disabled/enabled automatically.</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_name']</td>
@@ -141,7 +156,7 @@
 		<tr>
 			<td>$_TAG_CONF['tag_stemming']</td>
 			<td>false</td>
-			<td>If this is true, each tag consisting only of alphabets will be stemmed.  For example, tag "realize" will be stemmed into "real", thus tag "realize" will be identidied with tag "real".<br><br><strong>@WARNING: The stemming feature is still not perfect.  For example, 'Firefox' is stemmed into 'Firefoxi'.  So, I don't recommend you set $_TAG_CONF['tag_stemming'] to true for the time being (and forever, maybe).</td>
+			<td>If this is true, each tag consisting only of alphabets will be stemmed.  For example, tag "realize" will be stemmed into "real", thus tag "realize" will be identidied with tag "real".<br><br><strong>@WARNING</strong>: The stemming feature is still not perfect.  For example, 'Firefox' is stemmed into 'Firefoxi'.  So, I don't recommend you set $_TAG_CONF['tag_stemming'] to true for the time being (and forever, maybe).</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_check_badword']</td>
@@ -187,6 +202,11 @@
 			<th>Version</th>
 			<th>Date</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="center">0.2.0</td>
+			<td class="center">2008-01-14</td>
+			<td><span class="fix">Fixed</span> broken links to stories in tag clouds when URL_rewite is off.<br><span class="new">New!</span> Now, the tag plugin will automatically rescan exisiting tags included in stories in case of re-installation.<br><span class="new">New!</span> Now, you can delete wrongly registered tags in the admin panel.<br><span class="new">New!</span> Now, a tag cloud block will be created automatically during installation.</td>
 		</tr>
 		<tr>
 			<td class="center">0.1.0</td>

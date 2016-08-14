@@ -164,18 +164,20 @@ function plugin_upgrade_tag() {
 	$pi_version = $A['pi_version'];		// Version info stored in database
 	
 	// Do upgrading
-	
-// 	switch ($pi_version) {
-// 		case '':
-// 		break;
-// 		
-// 		case '':
-// 		break;
-// 		
-// 	}
+	switch ($pi_version) {
+		case '0.1.0':
+			$sql = "CREATE INDEX idx_tag_list_tag ON {$_TABLES['tag_list']} (tag)";
+			DB_query($sql);
+			$sql = "CREATE INDEX idx_tag_map_tag_id ON {$_TABLES['tag_map']} (tag_id)";
+			DB_query($sql);
+			
+			break;
+		
+		default:
+			break;
+	}
 	
 	// Update plugin info
-	
 	$result = DB_query("UPDATE {$_TABLES['plugins']} SET pi_version = \"{$_TAG_CONF['pi_version']}\" WHERE (pi_name = 'tag')");
 	COM_errorLog(ucfirst("tag") . " plugin was successfully updated to version {$_TAG_CONF['pi_version']}.");
 	
@@ -217,7 +219,10 @@ function plugin_uninstall_tag($installCheck = '') {
 	}
     	
 	// Ok to proceed and delete plugin
-
+	
+	// Delete tag cloud block
+	DB_query("DELETE FROM {$_TABLES['blocks']} WHERE (name = '" . addslashes($_TAG_CONF['default_block_name']) . "') AND (type = 'phpblock')");
+	
     // Unregister the plugin with Geeklog
     COM_errorLog('Attempting to unregister the tag plugin from Geeklog', 1);
     DB_query("DELETE FROM {$_TABLES['plugins']} WHERE pi_name = 'tag'", 1);
@@ -357,6 +362,22 @@ function plugin_getheadercode_tag() {
 	}
 	
 	return '<link rel="stylesheet" type="text/css" href="' . $url . '">';
+}
+
+/**
+* Enable/Disable a default tag cloud block when tag plugin is being
+* enabled/disabled (for Geeklog-1.4.1 or later)
+*
+* @param boolean $state - true if enabling, false if disabling
+*/
+function plugin_enablestatechange_tag($state) {
+	global $_TABLES, $_TAG_CONF;
+	
+	$state = ($state === true) ? 1 : 0;
+	$sql = "UPDATE {$_TABLES['blocks']} "
+		 . "SET is_enabled = '" . addslashes($state) . "' "
+		 . "WHERE (name = '" . addslashes($_TAG_CONF['default_block_name']) . "')";
+	$result = DB_query($sql);
 }
 
 /**
@@ -934,7 +955,7 @@ function TAG_getTaggedItems($tag) {
 				$body  = stripslashes($A['introtext']) . '<br>'
 					   . stripslashes($A['bodytext']);
 				$all_tags = TAG_scanTag($body);
-				$url = COM_buildURL($_CONF['site_url'] . '/article.php?sid=' . $L['sid']);
+				$url = COM_buildURL($_CONF['site_url'] . '/article.php?story=' . $L['sid']);
 				break;
 			
 			default:
@@ -985,6 +1006,75 @@ function TAG_checkBadword($word) {
 	}
 	
 	return in_array($word, $list);
+}
+
+/**
+* Rescan a tag in articles when it is unbanned
+*/
+function TAG_rescanTag($tag) {
+	global $_TABLES;
+	
+	$sql = "SELECT sid, introtext, bodytext FROM {$_TABLES['stories']}";
+	$result = DB_query($sql);
+	if (DB_error()) {
+		return false;
+	}
+	
+	$sids = array();
+	
+	while (($A = DB_fetchArray($result)) !== false) {
+		if (in_array($tag, TAG_scanTag(stripslashes($A['introtext'])))) {
+			$sids[] = $A['sid'];
+			continue;
+		} else if (in_array($tag, TAG_scanTag(stripslashes($A['bodytext'])))) {
+			$sids[] = $A['sid'];
+		}
+	}
+	
+	if (count($sids) > 0) {
+		TAG_saveTagToList($tag);
+		
+		foreach ($sids as $sid) {
+			TAG_saveTagToMap($tag, $sid, 'article');
+		}
+	}
+	
+	return true;
+}
+
+/**
+* Scan all stories for tags
+*
+* @note This is a very costly process, and should be used sparingly
+*/
+function TAG_scanAllStories() {
+	global $_TABLES;
+	
+	$sql = "SELECT sid, introtext, bodytext FROM {$_TABLES['stories']}";
+	$result = DB_query($sql);
+	if (DB_error()) {
+		return false;
+	}
+	
+	$tags = array();
+	
+	while (($A = DB_fetchArray($result)) !== false) {
+		$tags_in_introxtext = TAG_scanTag(stripslashes($A['introtext']));
+		$tags_in_bodytext   = TAG_scanTag(stripslashes($A['bodytext']));
+		$temp = array_merge($tags_in_introxtext, $tags_in_bodytext);
+		if (count($temp) > 0) {
+			$tags[$A['sid']] = $temp;
+		}
+	}
+	
+	if (count($tags) > 0) {
+		foreach ($tags as $sid => $tag) {
+			foreach ($tag as $t) {
+				TAG_saveTagToList($t);
+				TAG_saveTagToMap($t, $sid, 'article');
+			}
+		}
+	}
 }
 
 /**

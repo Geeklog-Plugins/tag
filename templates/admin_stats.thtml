@@ -1,0 +1,17 @@
+<p>{lang_desc_admin_stats}</p>
+
+<form method="post" action="{this_script}">
+	<table class="plugin">
+		<tr>
+			<th>{lang_lbl_tag}</th>
+			<th>{lang_lbl_count}</th>
+			<th>{lang_lbl_hit_count}</th>
+		</tr>
+		{body}
+	</table>
+	<br{xhtml}>
+	<input name="cmd" type="hidden" value="menuconfig">
+	<input name="action" type="hidden" value="doDelete">
+	<input name="submit" type="submit" value="{lang_delete_checked}">
+	<input name="submit" type="submit" value="{lang_ban_checked}">
+</form>

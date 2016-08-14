@@ -1,0 +1,20 @@
+<p>{lang_desc_admin_badword}</p>
+{msg}
+
+<form method="post" action="{this_script}">
+	<input name="cmd" type="hidden" value="badword"{xhtml}>
+	<input name="action" type="hidden" value="doDelete"{xhtml}>
+	<input name="word" type="text"{xhtml}>
+	<input name="submit" type="submit" value="{lang_add}">
+	<br{xhtml}>
+	
+	<table class="plugin">
+		<tr>
+			<th>{lang_lbl_tag}</th>
+		</tr>
+		{body}
+	</table>
+	<br{xhtml}>
+	
+	<input name="submit" type="submit" value="{lang_delete_checked}"{xhtml}>
+</form>

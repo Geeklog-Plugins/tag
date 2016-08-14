@@ -57,38 +57,49 @@ $pi_url     = $_TAG_CONF['pi_url'];		// Plugin Homepage
 //
 
 $NEWTABLE = array();
-$NEWTABLE['tag_list'] = "CREATE TABLE " . $_TABLES['tag_list'] . " ("
-        . "tag_id MEDIUMINT(10) NOT NULL AUTO_INCREMENT,"
+$NEWTABLE['tag_list'] = array(
+	"CREATE TABLE " . $_TABLES['tag_list'] . " ("
+		. "tag_id MEDIUMINT(10) NOT NULL AUTO_INCREMENT,"
 		. "tag VARCHAR(255) NOT NULL DEFAULT '',"
 		. "hits MEDIUMINT(10) NOT NULL DEFAULT '0',"
-        . "PRIMARY KEY tag_id(tag_id)"
-        . ")";
-$NEWTABLE['tag_map'] = "CREATE TABLE " . $_TABLES['tag_map'] . " ("
-        . "map_id MEDIUMINT(10) NOT NULL AUTO_INCREMENT,"
+		. "PRIMARY KEY tag_id(tag_id)"
+		. ")",
+	"CREATE INDEX idx_tag_list_tag ON {$_TABLES['tag_list']} (tag)",
+);
+
+$NEWTABLE['tag_map'] = array(
+	"CREATE TABLE " . $_TABLES['tag_map'] . " ("
+		. "map_id MEDIUMINT(10) NOT NULL AUTO_INCREMENT,"
 		. "tag_id MEDIUMINT(10) NOT NULL DEFAULT '0',"
 		. "type VARCHAR(30) NOT NULL DEFAULT 'article',"
 		. "sid VARCHAR(40) NOT NULL DEFAULT '',"
-        . "PRIMARY KEY map_id(map_id)"
-		. ")";
-$NEWTABLE['tag_badwords'] = "CREATE TABLE " . $_TABLES['tag_badwords'] . " ("
+		. "PRIMARY KEY map_id(map_id)"
+		. ")",
+	"CREATE INDEX idx_tag_map_tag_id ON {$_TABLES['tag_map']} (tag_id)",
+);
+
+$NEWTABLE['tag_badwords'] = array(
+	"CREATE TABLE " . $_TABLES['tag_badwords'] . " ("
 		. "badword VARCHAR(255) NOT NULL,"
 		. "PRIMARY KEY badword(badword)"
-		. ")";
-$NEWTABLE['tag_menu'] = "CREATE TABLE " . $_TABLES['tag_menu'] . " ("
+		. ")",
+);
+
+$NEWTABLE['tag_menu'] = array(
+	"CREATE TABLE " . $_TABLES['tag_menu'] . " ("
 		. "menu_id INT(10) NOT NULL AUTO_INCREMENT,"
 		. "menu_name VARCHAR(255) NOT NULL DEFAULT '',"
 		. "tag_ids VARCHAR(255) NOT NULL DEFAULT '',"
 		. "parent_id INT(10) NOT NULL DEFAULT '0',"
 		. "dsp_order INT(10) NOT NULL DEFAULT '0',"
 		. "PRIMARY KEY menu_id(menu_id)"
-		. ")";
+		. ")",
+);
 
 // Default data
-
 $DEFVALUES = array();
 
 // Security Feature(s) to add
-
 $NEWFEATURE = array();
 $NEWFEATURE['tag.admin'] = "tag Admin";
 
@@ -115,39 +126,41 @@ if (!SEC_inGroup('Root')) {
 */
 function plugin_install_tag() {
     global $pi_name, $pi_version, $gl_version, $pi_url, $NEWTABLE, $DEFVALUES,
-		$NEWFEATURE, $_TABLES, $_CONF;
+		   $NEWFEATURE, $_CONF, $_TABLES, $_USER, $_TAG_CONF, $LANG_TAG;
 
     COM_errorLog("Attempting to install the $pi_name Plugin", 1);
 
     // Create the Plugins Tables
     
-    foreach ($NEWTABLE as $table => $sql) {
+    foreach ($NEWTABLE as $table => $sqls) {
         COM_errorLog("Creating $table table", 1);
-        DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog("Error Creating $table table", 1);
-            plugin_uninstall_tag();
-            return false;
-            exit;
-        }
+		
+		foreach ($sqls as $sql) {
+	        DB_query($sql, 1);
+	        if (DB_error()) {
+	            COM_errorLog("Error Creating $table table", 1);
+	            plugin_uninstall_tag();
+	            return false;
+	            exit;
+	        }
+		}
+		
         COM_errorLog("Success - Created $table table", 1);
     }
     
     // Insert Default Data
     
-    foreach ($DEFVALUES as $table => $sqls) {
+    foreach ($DEFVALUES as $table => $sql) {
         COM_errorLog("Inserting default data into $table table", 1);
 		
-		foreach ($sqls as $sql) {
-            DB_query($sql, 1);
-            if (DB_error()) {
-                COM_errorLog("Error inserting default data into $table table", 1);
-                plugin_uninstall_tag();
-                return false;
-                exit;
-            }
+        DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("Error inserting default data into $table table", 1);
+            plugin_uninstall_tag();
+            return false;
+            exit;
 		}
-
+		
         COM_errorLog("Success - inserting data into $table table", 1);
     }
     
@@ -210,7 +223,6 @@ function plugin_install_tag() {
     }
 
     // Register the plugin with Geeklog
-
     COM_errorLog("Registering $pi_name plugin with Geeklog", 1);
     DB_delete($_TABLES['plugins'],'pi_name','tag');
     DB_query("INSERT INTO {$_TABLES['plugins']} (pi_name, pi_version, pi_gl_version, pi_homepage, pi_enabled) "
@@ -221,7 +233,18 @@ function plugin_install_tag() {
         return false;
         exit;
     }
-
+	
+	// Add a tag cloud block to the site
+	$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, tid, blockorder, onleft, phpblockfn, owner_id, group_id, perm_owner, perm_group, perm_members, perm_anon) "
+		 . "VALUES ('1', '" . addslashes($_TAG_CONF['default_block_name'])
+		 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
+		 . "', 'all', '1', '0', 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
+		 . "', '1', '3', '3', '2', '2')";
+	DB_query($sql);
+	
+	// Scan all tags that might already exist in stories in case of re-installation
+	TAG_scanAllStories();
+	
     COM_errorLog("Succesfully installed the $pi_name Plugin!", 1);
     return true;
 }

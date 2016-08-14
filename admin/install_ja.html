@@ -44,8 +44,21 @@
 		.admin {
 			background-color: aqua;
 		}
+		.center {
+			text-align: center;
+		}
 		li {
 			padding: 5px 5px 10px 5px;
+		}
+		.fix {
+			color: white;
+			background-color: red;
+			font-weight: bold;
+		}
+		.new {
+			color: white;
+			background-color: blue;
+			font-weight: bold;
 		}
 	<! -->
 	</style>
@@ -61,7 +74,7 @@
 		</tr>
 		<tr>
 			<th>バージョン</th>
-			<td>0.1.0</td>
+			<td>0.2.0</td>
 		</tr>
 		<tr>
 			<th>作者</th>
@@ -103,14 +116,14 @@
 		<li>プラグインエディタから，tag プラグインをアンインストールします。このとき，tagプラグインが使用していたテーブルは破棄され，その中に記録されていたデータも削除されます。</li>
 		<li>インストールの過程で作成した3つのディレクトリ（<span class="geeklog">&lt;geeklog-dir&gt;</span>/plugins/tag/ <span class="public">&lt;public_html&gt;</span>/tag/ and <span class="admin">&lt;admin&gt;</span>/plugins/tag/ を削除します。</li>
 	</ol>
-
+	
 	<h2>使用法</h2>
 	
-	<p>記事を書いていてタグをつけたくなったら，<code>[tag:好きなタグ名]</code>を記事中に入力します。次のように複数のタグを指定することもできます。<code>[tag:Geeklog plugins]</code>タグとタグの間はスペースで区切ります。デフォルトの設定では，タグの大文字と小文字は区別されません。たとえば，"Geeklog"は，"geeklog"や"GEEKLOG"と同じとみなされます。</p>
+	<p>記事を書いていてタグをつけたくなったら，<code>[tag:好きなタグ名]</code>を記事中に入力します。次のように複数のタグを指定することもできます。<code>[tag:Geeklog plugins]</code>タグとタグの間はスペースで区切ります。"Zend Framework"のような複数の単語で構成されるタグを登録するには，アンダースコア(_)を使って"Zend Framework"と入力してください。デフォルトの設定では，タグの大文字と小文字は区別されません。たとえば，"Geeklog"は，"geeklog"や"GEEKLOG"と同じとみなされます。</p>
 	
 	<ul>
 		<li>ある種のタグを禁止したい場合には，管理者メニューから禁止できます。やはり，大文字と小文字は区別されません。</li>
-		<li>サイトのブロックに「タグクラウド」を表示する場合は，PHPブロックを作成し，関数名に<strong>phpblock_tag_cloud</strong>を入力します。</li>
+		<li>サイトのブロックに「タグクラウド」を表示する場合は，PHPブロックを作成し，関数名に<strong>phpblock_tag_cloud</strong>を入力します。<br><strong>メモ</strong>：バージョン0.2.0以降，タグクラウドブロックはインストール時に自動的に作成されます。</li>
 		<li>タグクラウドの外観は，<span class="geeklog">&lt;geeklog&gt;</span>/plugins/tag/templates/にあるテンプレートとCSS(<span class="public">&lt;public_html&gt;</span>/tag/tag.css)で変更できます。なお，<span class="public">&lt;public_html&gt;</span>/layout/your_theme/tag.cssが存在する場合は，そちらの方が優先されます。</li>
 	</ul>
 	
@@ -123,6 +136,11 @@
 			<th>変数名</th>
 			<th>デフォルト（既定）値</th>
 			<th>説明</th>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['default_block_name']</td>
+			<td>'tag_cloud_block'</td>
+			<td>インストール時に作成されるタグクラウドブロックの名前。Geeklog-1.4.1以降を使っている場合，tagプラグインの有効/無効と連動して表示/非表示にされる。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_name']</td>
@@ -142,7 +160,7 @@
 		<tr>
 			<td>$_TAG_CONF['tag_stemming']</td>
 			<td>false</td>
-			<td>trueにすると，アルファベットだけで構成されるタグは語幹だけに切り詰められます（英語のみ）。たとえば，"realize"というタグは"real"に切り詰められ，結果として"realize"というタグは"real"というタグと同じものと見なされます。<br><br><strong>@警告: この機能はまだ完全ではありません。たとえば，'Firefox'というタグは切り詰められて，'Firefoxi'になります。したがって，このオプションをtrueに設定することは当分の間（おそらく，ずっと）お勧めしません。</td>
+			<td>trueにすると，アルファベットだけで構成されるタグは語幹だけに切り詰められます（英語のみ）。たとえば，"realize"というタグは"real"に切り詰められ，結果として"realize"というタグは"real"というタグと同じものと見なされます。<br><br><strong>警告</strong>: この機能はまだ完全ではありません。たとえば，'Firefox'というタグは切り詰められて，'Firefoxi'になります。したがって，このオプションをtrueに設定することは当分の間（おそらく，ずっと）お勧めしません。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_check_badword']</td>
@@ -190,12 +208,16 @@
 			<th>説明</th>
 		</tr>
 		<tr>
+			<td class="center">0.2.0</td>
+			<td class="center">2008-01-14</td>
+			<td><span class="fix">修正</span> URLリライトがオフのとき，タグクラウドの下に表示されていた記事へのリンクが間違って生成されていた問題に対応しました。<br><span class="new">New!</span> Tagプラグインをインストールし直すときに，記事に含まれている[tag:foo]タグを自動的に登録する処理を追加しました。<br><span class="new">New!</span> 間違って登録したタグをコントロールパネルから削除する機能を追加しました。<br><span class="new">New!</span> インストール時にタグクラウドブロックを自動的に作成するようにしました。</td>
+		</tr>
+		<tr>
 			<td class="center">0.1.0</td>
 			<td class="center">2008-01-12</td>
 			<td>初期バージョン</td>
 		</tr>
 	</table>
-	
 
 </body>
 </html>

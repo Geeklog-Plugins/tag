@@ -76,7 +76,7 @@ class TagStats
 		
 		$retval = '';
 		
-		$sql = "SELECT L.tag, COUNT(m.tag_id) AS cnt, L.hits "
+		$sql = "SELECT L.tag_id, L.tag, COUNT(m.tag_id) AS cnt, L.hits "
 			 . "FROM {$_TABLES['tag_list']} AS L "
 			 . "LEFT JOIN {$_TABLES['tag_map']} AS m "
 			 . "ON L.tag_id = m.tag_id "
@@ -89,20 +89,40 @@ class TagStats
 			return $retval . '<p>' . TAG_str('no_tag') . '</p>';
 		}
 		
+		$display = COM_siteHeader();
+		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
+		$T->set_file('stats', 'admin_stats.thtml');
+		$T->set_var('xhtml', XHTML);
+		$T->set_var(
+			'this_script',
+			COM_buildURL($_CONF['site_admin_url'] . '/plugins/tag/index.php')
+		);
+		$T->set_var('lang_desc_admin_stats', TAG_str('desc_admin_stats'));
+		$T->set_var('lang_lbl_tag', TAG_str('lbl_tag'));
+		$T->set_var('lang_lbl_count', TAG_str('lbl_count'));
+		$T->set_var('lang_lbl_hit_count', TAG_str('lbl_hit_count'));
+		$T->set_var('lang_delete_checked', TAG_str('delete_checked'));
+		$T->set_var('lang_ban_checked', TAG_str('ban_checked'));
+		
 		$sw = 1;
-		$retval = '<table class="plugin">' . LB
-				.  '<tr><th>' . TAG_str('lbl_tag') . '</th><th>' . TAG_str('lbl_count')
-				.  '</th><th>' . TAG_str('lbl_hit_count') . '</th></tr>' . LB;
+		$body = '';
 		
 		while (($A = DB_fetchArray($result)) !== false) {
-			$retval .= '<tr class="pluginRow' . $sw . '"><td>'
-					.  TAG_escape($A['tag']) . '</td><td style="text-align: right;">'
-					.  TAG_escape($A['cnt']) . '</td><td style="text-align: right;">'
-					.  TAG_escape($A['hits']) .  '</td></tr>' . LB;
+			$tag_id = $A['tag_id'];
+			$body .= '<tr class="pluginRow' . $sw . '">'
+				  .  '<td><input id="tag' . TAG_escape($tag_id) . '" name="tag_ids[]" '
+				  .  'type="checkbox" value="' . TAG_escape($A['tag_id'])
+				  .  '"' . XHTML . '><label for="tag' . TAG_escape($tag_id)
+				  .  '">' . TAG_escape($A['tag']) . '</label></td>'
+				  .  '<td style="text-align: right;">' .  TAG_escape($A['cnt'])
+				  .  '</td><td style="text-align: right;">'
+				  .  TAG_escape($A['hits']) .  '</td></tr>' . LB;
 			$sw = ($sw == 1) ? 2 : 1;
 		}
 		
-		$retval .= '</table>' . LB;
+		$T->set_var('body', $body);
+		$T->parse('output', 'stats');
+		$retval = $T->finish($T->get_var('output'));
 		
 		return $retval;
 	}
@@ -117,6 +137,42 @@ class TagStats
 	
 	function doDelete()
 	{
+		global $_TABLES, $LANG_TAG;
+		
+		// Retrieve request vars
+		$tag_ids = TAG_post('tag_ids', true, true);
+		if (count($tag_ids) == 0) {
+			return '';
+		}
+		
+		$cmd = TAG_post('submit');
+		if ($cmd != $LANG_TAG['delete_checked']
+		 AND $cmd != $LANG_TAG['ban_checked']) {
+			return '';
+		}
+		
+		$tag_ids = array_map('addslashes', $tag_ids);
+		$tag_ids = "'" . implode("','", $tag_ids) . "'";
+		
+		// Register banned words into DB
+		if ($cmd == $LANG_TAG['ban_checked']) {
+			$sql = "INSERT INTO {$_TABLES['tag_badwords']} "
+				 . "SELECT tag FROM {$_TABLES['tag_list']} "
+				 . "WHERE (tag_id IN ({$tag_ids}))";
+			$result = DB_query($sql);
+		}
+		
+		// Delete tags from registered tag list
+		$sql = "DELETE FROM {$_TABLES['tag_list']} "
+			 . "WHERE (tag_id IN ({$tag_ids}))";
+		$result = DB_query($sql);
+
+		$sql = "DELETE FROM {$_TABLES['tag_map']} "
+			 . "WHERE (tag_id IN ({$tag_ids}))";
+		$result = DB_query($sql);
+		
+		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
+		
 	}
 }
 
