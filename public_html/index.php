@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/tag/index.php                                                 |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -33,42 +33,34 @@
 
 require_once '../lib-common.php';
 
-if (!defined('XHTML')) {
-	define('XHTML', '');
+if (!in_array('tag', $_PLUGINS)) {
+	COM_output(COM_refresh($_CONF['site_url'] . '/index.php'));
+	exit;
 }
 
-/**
-* Retrieve request vars
-*/
+// Retrieves request vars
 COM_setArgNames(array('tag'));
 $tag = COM_getArgument('tag');
 
 /**
 * Display
 */
-$display = COM_siteHeader();
 $T = new Template($_CONF['path'] . 'plugins/tag/templates');
 $T->set_file('page', 'index.thtml');
 $T->set_var('xhtml', XHTML);
 
-/**
-* Lang vars
-*/
+// Lang vars
 $lang_vars = array('tag_list');
 
 foreach ($lang_vars as $lang_var) {
 	$T->set_var('lang_' . $lang_var, TAG_str($lang_var));
 }
 
-/**
-* Tag cloud
-*/
+// Tag cloud
 $T->set_var('tag_cloud', TAG_getTagCloud($_TAG_CONF['max_tag_cloud'], false));
 
-/**
-* Other tags
-*/
-if ($tag != '') {
+// Other tags
+if ($tag !== '') {
 	$tag = TAG_normalize($tag);
 	$tag_id = TAG_getTagId($tag);
 
@@ -83,10 +75,19 @@ if ($tag != '') {
 		$T->set_var('selected_tag', sprintf($LANG_TAG['selected_tag'], TAG_escape($text)));
 	}
 
-	$T->set_var('tagged_items', ($tag != '') ? TAG_getTaggedItems($tag) : '');
+	$T->set_var(
+		'tagged_items',
+		($tag !== '') ? TAG_getTaggedItems($tag) : ''
+	);
 }
 
 $T->parse('output', 'page');
-$display .= $T->finish($T->get_var('output'))
-		 .  COM_siteFooter();
+$content = $T->finish($T->get_var('output'));
+
+if (is_callable('COM_createHTMLDocument')) {
+	$display = COM_createHTMLDocument($content);
+} else {
+	$display = COM_siteHeader() . $content . COM_siteFooter();
+}
+
 COM_output($display);

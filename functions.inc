@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | private/plugins/tag/functions.inc                                         |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -31,9 +31,11 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------+
 
-/**
-* Includes language file 
-*/
+if (stripos($_SERVER['PHP_SELF'], 'functions.inc') !== FALSE) {
+    die('This file cannot be used on its own.');
+}
+
+// Includes language file 
 $langfile = $_CONF['path'] . 'plugins/tag/language/' . $_CONF['language'] . '.php';
 
 if (file_exists($langfile)) {
@@ -42,15 +44,11 @@ if (file_exists($langfile)) {
 	include_once $_CONF['path'] . 'plugins/tag/language/english.php';
 }
 
-/*
-* Loads config
-*/
+// Loads config
 require_once $_CONF['path'] . 'plugins/tag/config.php';
 TAG_loadConfig();
 
-/**
-* Includes Porter Stemmer
-*/
+// Includes Porter Stemmer
 if ($_TAG_CONF['tag_stemming'] === TRUE) {
 	require_once $_CONF['path'] . 'plugins/tag/porter_stemmer.php';
 }
@@ -67,7 +65,7 @@ if ($_TAG_CONF['tag_stemming'] === TRUE) {
 function plugin_getmenuitems_tag() {
 	global $_CONF, $_TAG_CONF;
 
-	if ($_TAG_CONF['hidetagmenu'] == FALSE) {
+	if ($_TAG_CONF['hidetagmenu'] === FALSE) {
 		$menulabel = TAG_str('admin_label');
 		$menurul   = $_CONF['site_url'] . "/tag/index.php";
 		$menuitems = array();
@@ -169,7 +167,7 @@ function plugin_upgrade_tag() {
 				plugin_initconfig_tag();
 			}
 
-			/* Fall through into the next case */
+			/* Falls through into the next case */
 
 		case '0.4.1':
 			require_once $_CONF['path_system'] . 'classes/config.class.php';
@@ -178,7 +176,7 @@ function plugin_upgrade_tag() {
 			$c = config::get_instance();
 			$c->add('hidetagmenu', $_TAG_DEFAULT['hidetagmenu'], 'select', 0, 0, 0, 5, TRUE, 'tag');
 
-			/* Fall through into the next case */
+			/* Falls through into the next case */
 
 		case '0.5.0':
 		case '0.5.1':
@@ -188,10 +186,11 @@ function plugin_upgrade_tag() {
 			$c = config::get_instance();
 			$c->add('tag_cloud_threshold_max_count', $_TAG_DEFAULT['tag_cloud_threshold_max_count'], 'text', 0, 0, NULL, 105, TRUE, 'tag');
 
-			/* Fall through into the next case */
+			/* Falls through into the next case */
 
 		case '0.5.2':
 		case '0.5.3':
+		case '0.5.4':
 		default:
 			break;
 	}
@@ -244,13 +243,12 @@ function plugin_getheadercode_tag() {
 	$theme = isset($_USER['theme']) ? $_USER['theme'] : $_CONF['theme'];
 	clearstatcache();
 
-	if (file_exists($_CONF['path_themes'] . $theme . '/tag.css')) {
-		$url = $_CONF['site_url'] . '/layout/' . $theme . '/tag.css';
-	} else {
-		$url = $_CONF['site_url'] . '/tag/tag.css';
-	}
+	$url = file_exists($_CONF['path_themes'] . $theme . '/tag.css')
+		 ? $_CONF['site_url'] . '/layout/' . $theme . '/tag.css'
+		 : $_CONF['site_url'] . '/tag/tag.css';
 
-	$retval = '<link rel="stylesheet" type="text/css" href="' . $url . '"' . XHTML . '>';
+	$retval = '<link rel="stylesheet" type="text/css" href="' . $url . '"'
+			. XHTML . '>';
 
 	if ($_TAG_CONF['num_keywords'] > 0) {
 		$keywords = TAG_getKeywords($_TAG_CONF['num_keywords']);
@@ -267,7 +265,7 @@ function plugin_getheadercode_tag() {
 }
 
 /**
-* Enable/Disable a default tag cloud block when tag plugin is being
+* Enables/Disables a default tag cloud block when tag plugin is being
 * enabled/disabled (for Geeklog-1.4.1 or later)
 *
 * @param   boolean  $state - TRUE if enabling, FALSE if disabling
@@ -281,6 +279,40 @@ function plugin_enablestatechange_tag($state) {
 		 . "WHERE (name = '" . addslashes($_TAG_CONF['default_block_name']) . "') "
 		 . "OR (name = '" . addslashes($_TAG_CONF['default_block_name_menu']) . "')";
 	DB_query($sql);
+}
+
+/**
+* Callback function invoked when other plugins were installed/uninstalled
+*
+* @param   string  $type    plugin name
+* @param   string  $status  new status: 'enabled', 'disabled', 'installed',
+*                                       'uninstalled', 'upgraded'
+* @return  (void)
+*/
+function plugin_pluginstatechange_tag($type, $status) {
+	global $_TABLES;
+	
+	$type = strtolower($type);
+	
+	if ($type !== 'tag') {
+		switch ($status) {
+			case 'installed':
+				if (TAG_checkValidType($type)) {
+					$f = 'plugin_tag_scanall_' . $type;
+					$f();
+				}
+				break;
+			
+			case 'uninstalled':
+				$sql = "DELETE FROM {$_TABLES['tag_map']} "
+					 . "WHERE (type = '" . addslashes($type) . "') ";
+				DB_query($sql);
+				break;
+			
+			default:
+				break;
+		}
+	}
 }
 
 /**
@@ -429,16 +461,14 @@ function TAG_stem($str) {
 
 	$encoding = COM_getCharset();
 
-	if (!is_object($porterStemmer)) {
+	if (!is_object($porterStemmer) OR !$porterStemmer instanceof PorterStemmer) {
 		$porterStemmer = new PorterStemmer();
 	}
 
 	$retval = '';
 
 	if (function_exists('mb_strlen')) {
-		/**
-		* Stem English part
-		*/
+		// Stems English part
 		$i    = 0;
 		$len  = mb_strlen($str, $encoding);
 		$temp = $str;
@@ -450,7 +480,7 @@ function TAG_stem($str) {
 			if (mb_strwidth($ch, $encoding) == 1) {
 				$word .= $ch;
 			} else {
-				if ($word != '') {
+				if ($word !== '') {
 					$str .= $porterStemmer->Stem($str);
 					$word = '';
 				} else {
@@ -461,7 +491,7 @@ function TAG_stem($str) {
 			$i ++;
 		}
 
-		if ($word != '') {
+		if ($word !== '') {
 			$str .= $porterStemmer->Stem($word);
 		}
 	} else {
@@ -517,14 +547,15 @@ function TAG_normalize($str) {
 function plugin_autotags_tag($cmd, $content = '', $autotag = '') {
 	global $_CONF, $_TAG_CONF, $LANG_TAG;
 
-	if ($cmd == 'tagname') {
+	if ($cmd === 'tagname') {
 		return $_TAG_CONF['tag_name'];
-	} else if (in_array(strtolower($autotag['tag']), (array) $_TAG_CONF['tag_name'])) {
+	} else if (($cmd === 'parse') AND
+			   (strcasecmp($autotag['tag'], $_TAG_CONF['tag_name']) === 0)) {
 		$tagstr   = $autotag['tagstr'];
 		$param    = substr($tagstr, strlen($_TAG_CONF['tag_name']) + 2, -1);
 		$tag_part = '';
 
-		if ($param != '') {
+		if ($param !== '') {
 			$tags = TAG_split($param);
 
 			foreach ($tags as $tag) {
@@ -560,7 +591,7 @@ function plugin_autotags_tag($cmd, $content = '', $autotag = '') {
 				// Replaces a tag part with a NULL string
 				$content = str_replace($tagstr, '', $content);
 			} else {
-				if ($tag_part != '') {
+				if ($tag_part !== '') {
 					$content = str_replace(
 						$tagstr, $LANG_TAG['display_label'] . $tag_part, $content
 					);
@@ -622,7 +653,7 @@ function plugin_getdocumentationurl_tag($file) {
 * Returns a tag id of a given tag
 *
 * @param   string  $tag  a normalized tag
-* @return  int           a tag id
+* @return  mixed         int = a tag id, FALSE = not found
 */
 function TAG_getTagId($tag) {
 	global $_TABLES;
@@ -640,7 +671,8 @@ function TAG_getTagId($tag) {
 	if (DB_error() OR ($tag_id == '')) {
 		return FALSE;
 	} else {
-		$list[$tag] = (int) $tag_id;
+		$tag_id = (int) $tag_id;
+		$list[$tag] = $tag_id;
 
 		return $tag_id;
 	}
@@ -659,7 +691,7 @@ function TAG_getTagName($tag_id) {
 		$_TABLES['tag_list'], 'tag', "(tag_id = '" . addslashes($tag_id) . "')"
 	);
 
-	if (DB_error() OR ($tag == '')) {
+	if (DB_error() OR ($tag === '')) {
 		return '';
 	} else {
 		return $tag;
@@ -669,7 +701,7 @@ function TAG_getTagName($tag_id) {
 /**
 * Saves a tag into tag list
 *
-* @param   string  $tag  a normalized tag
+* @param   string   $tag  a normalized tag
 * @return  (void)
 */
 function TAG_saveTagToList($tag) {
@@ -677,10 +709,10 @@ function TAG_saveTagToList($tag) {
 
 	$tag = trim($tag);
 
-	if (($tag != '') AND (TAG_getTagId($tag) == '')) {
+	if (($tag !== '') AND (TAG_getTagId($tag) === FALSE)) {
 		$sql = "INSERT INTO {$_TABLES['tag_list']} (tag) "
 			 . "  VALUES ('" . addslashes($tag) . "')";
-		$result = DB_query($sql);
+		DB_query($sql);
 	}
 }
 
@@ -698,20 +730,22 @@ function TAG_saveTagToMap($tag, $id, $type) {
 
 	$tag = trim($tag);
 
-	if ($tag != '') {
+	if ($tag !== '') {
 		$tag_id = TAG_getTagId($tag);
+		
+		if ($tag_id !== FALSE) {
+			$count = (int) DB_getItem(
+				$_TABLES['tag_map'],
+				"COUNT(*) AS cnt ",
+				"(tag_id = {$tag_id}) AND " . " (sid = '" . addslashes($id) . "') AND " . " (type = '" . addslashes($type) . "')"
+			);
 
-		$count = DB_getItem(
-			$_TABLES['tag_map'],
-			"COUNT(*) AS cnt ",
-			"(tag_id = '" . addslashes($tag_id) . "') AND " . " (sid = '" . addslashes($id) . "') AND " . " (type = '" . addslashes($type) . "')"
-		);
-
-		if (!DB_error() AND ($count == 0)) {
-			$sql = "INSERT INTO {$_TABLES['tag_map']} (tag_id, type, sid) "
-				 . "VALUES ('" . addslashes($tag_id) . "', '" . addslashes($type)
-				 . "', '" . addslashes($id) . "')";
-			$result = DB_query($sql);
+			if (!DB_error() AND ($count === 0)) {
+				$sql = "INSERT INTO {$_TABLES['tag_map']} (tag_id, type, sid) "
+					 . "  VALUES ({$tag_id}, '" . addslashes($type) . "', '"
+					 . addslashes($id) . "')";
+				DB_query($sql);
+			}
 		}
 	}
 }
@@ -727,7 +761,7 @@ function TAG_scanTag($str) {
 
 	$retval = array();
 
-	$pattern = '|\[' . $_TAG_CONF['tag_name'] . ':([^\]]*)\]|i';
+	$pattern = '|\[' . $_TAG_CONF['tag_name'] . ':([^\]]+)\]|i';
 
 	if (preg_match_all($pattern, $str, $match, PREG_SET_ORDER)) {
 		foreach ($match as $M) {
@@ -735,6 +769,7 @@ function TAG_scanTag($str) {
 
 			foreach ($parts as $part) {
 				$part = TAG_normalize($part);
+				
 				if (TAG_isBadword($part) === TRUE) {
 					continue;
 				} else {
@@ -743,7 +778,7 @@ function TAG_scanTag($str) {
 					}
 				}
 
-				if (($part != '') AND (strlen($part) <= $_TAG_CONF['max_tag_len'])) {
+				if (($part !== '') AND (strlen($part) <= $_TAG_CONF['max_tag_len'])) {
 					$retval[] = $part;
 				}
 			}
@@ -806,18 +841,19 @@ function plugin_itemsaved_tag($id, $type, $old_id = '') {
 	$tags = array();
 
 	// Deletes old records from tag_map
-	$sid = ($old_id == '') ? $id : $old_id;
+	$sid = ($old_id === '') ? $id : $old_id;
 	$sql = "DELETE FROM {$_TABLES['tag_map']} "
-		 . "WHERE (type = '" . addslashes($type) . "') "
-		 . "  AND (sid = '" . addslashes($sid) . "') ";
+		 . "  WHERE (type = '" . addslashes($type) . "') "
+		 . "    AND (sid = '" . addslashes($sid) . "') ";
 	DB_query($sql);
 
 	switch ($type) {
 		case 'article':
 			// Retrieves article data and scan for tags
 			$sql = "SELECT introtext, bodytext "
-				 . "FROM {$_TABLES['stories']} "
-				 . "WHERE (sid = '" . addslashes($id) . "')";
+				 . "  FROM {$_TABLES['stories']} "
+				 . "WHERE (sid = '" . addslashes($id) . "') "
+				 . "  AND (draft_flag = 0) AND (date <= NOW()) ";
 			$result = DB_query($sql);
 			$A = DB_fetchArray($result);
 			$introtext = stripslashes($A['introtext']);
@@ -855,7 +891,13 @@ function plugin_itemsaved_tag($id, $type, $old_id = '') {
 			break;
 
 		default:
-			COM_errorLog(__FUNCTION__ . ': $id = ' . $id . ', $type = ' . $type);
+			if (TAG_checkValidType($type) == TRUE) {
+				$function = 'plugin_tag_scantag_' . $type;
+				$tags = $function($id);
+ 			} else {
+				COM_errorLog(__FUNCTION__ . ': $id = ' . $id . ', $type = ' . $type);
+			}
+			
 			break;
 	}
 
@@ -921,7 +963,7 @@ function TAG_getLevel($count) {
 }
 
 /**
-* Gets tag clouds
+* Gets a tag cloud
 *
 * @param   int      $limit     max number of clouds
 * @param   boolean  $is_block  TRUE = for site block, FALSE =
@@ -931,7 +973,7 @@ function TAG_getLevel($count) {
 function TAG_getTagCloud($limit = 0, $is_block = FALSE) {
 	global $_CONF, $_TABLES, $_TAG_CONF;
 
-	$sql = "SELECT t.tag_id, t.tag, COUNT(t.tag_id) AS cnt "
+	$sql = "SELECT t.tag_id, t.tag, m.type, COUNT(t.tag_id) AS cnt "
 		 . "  FROM {$_TABLES['tag_map']} AS m "
 		 . "    LEFT JOIN {$_TABLES['tag_list']} AS t "
 		 . "    ON t.tag_id = m.tag_id "
@@ -951,7 +993,11 @@ function TAG_getTagCloud($limit = 0, $is_block = FALSE) {
 	$list = array();
 
 	while (($A = DB_fetchArray($result)) !== FALSE) {
-		$list[$A['tag']] = array('tag_id' => $A['tag_id'], 'cnt' => $A['cnt']);
+		$list[$A['tag']] = array(
+			'tag_id' => (int) $A['tag_id'],
+			'cnt'    => (int) $A['cnt'],
+			'type'   => $A['type'],
+		);
 	}
 
 	ksort($list, SORT_STRING);
@@ -967,6 +1013,10 @@ function TAG_getTagCloud($limit = 0, $is_block = FALSE) {
 	$items = '';
 
 	foreach ($list as $tag => $data) {
+		if (TAG_checkValidType($data['type']) == FALSE) {
+			continue;
+		}
+		
 		$rel   = rawurlencode($tag);
 		$title = $tag;
 
@@ -985,7 +1035,10 @@ function TAG_getTagCloud($limit = 0, $is_block = FALSE) {
 		$items .= $T->finish($T->get_var('output')) . $_TAG_CONF['tag_cloud_spacer'];
 	}
 
-	$T->set_var('container_id', $is_block ? 'b_tag_cloud_container' : 'tag_cloud_container');
+	$T->set_var(
+		'container_id',
+		$is_block ? 'b_tag_cloud_container' : 'tag_cloud_container'
+	);
 	$T->set_var('items', $items);
 	$T->parse('output', 'container');
 
@@ -1004,7 +1057,7 @@ function TAG_formatRelatedTags($all_tags, $tag) {
 		sort($all_tags);
 
 		foreach ($all_tags as $t) {
-			if ($t != $tag) {
+			if ($t !== $tag) {
 				$url  = COM_buildURL($_CONF['site_url'] . '/tag/index.php?tag='
 					  . rawurlencode($t));
 				$text = $t;
@@ -1014,7 +1067,8 @@ function TAG_formatRelatedTags($all_tags, $tag) {
 				}
 
 				$text = TAG_escape($text);
-				$retval .= '<a href="' . $url . '" rel="' . $text . '">' . $text . '</a>  ';
+				$retval .= '<a href="' . $url . '" rel="' . $text . '">' . $text
+						.  '</a>  ';
 			}
 		}
 	}
@@ -1026,12 +1080,12 @@ function TAG_formatRelatedTags($all_tags, $tag) {
 * Returns items with a given tag
 */
 function TAG_getTaggedItems($tag) {
-	global $_CONF, $_TABLES, $_PLUGINS, $_TAG_CONF;
+	global $_CONF, $_TABLES, $_PLUGINS, $_TAG_CONF, $LANG09;
 
 	$retval = '';
 
 	$sql = "SELECT type, sid "
-		 . "FROM {$_TABLES['tag_map']} "
+		 . "  FROM {$_TABLES['tag_map']} "
 		 . "WHERE (tag_id = '" . addslashes(TAG_getTagId($tag)) . "')";
 	$result = DB_query($sql);
 
@@ -1049,69 +1103,41 @@ function TAG_getTaggedItems($tag) {
 	$T->set_file('item', 'tagged_item.thtml');
 
 	foreach ($list as $L) {
-		switch ($L['type']) {
-			case 'article':
-				$sql = "SELECT title, introtext, bodytext "
-					 . "FROM {$_TABLES['stories']} "
-					 . "WHERE (sid = '" . addslashes($L['sid']) . "') "
-					 . COM_getPermSQL('AND');
-				$result = DB_query($sql);
-				$num_rows = DB_numRows($result);
+		$num_rows = 0;
+		
+		if ($L['type'] === 'article') {
+			$sql = "SELECT title, introtext, bodytext "
+				 . "  FROM {$_TABLES['stories']} "
+				 . "WHERE (sid = '" . addslashes($L['sid']) . "') "
+				 . "  AND (draft_flag = 0) AND (date <= NOW()) "
+				 . COM_getPermSQL('AND');
+			$result = DB_query($sql);
+			$num_rows = (int) DB_numRows($result);
 
-				if ($num_rows == 0) {
-					continue;
-				}
-
+			if ($num_rows > 0) {
 				$A = DB_fetchArray($result);
 				$title = TAG_escape(stripslashes($A['title']));
 				$body  = stripslashes($A['introtext']) . '<br' . XHTML . '>'
 					   . stripslashes($A['bodytext']);
 				$all_tags = TAG_scanTag($body);
-				$url = COM_buildURL($_CONF['site_url'] . '/article.php?story=' . $L['sid']);
-				break;
-
-			case 'staticpages':
-				if (!in_array('staticpages', $_PLUGINS)) {
-					continue;
-				}
-
-				$sql = "SELECT sp_title "
-					 . "FROM {$_TABLES['staticpage']} "
-					 . "WHERE (sp_id = '" . addslashes($L['sid']) . "') "
-					 . "  AND (draft_flag = 0) AND (template_flag = 0) "
-					 . COM_getPermSQL('AND');
-				$result = DB_query($sql);
-				$num_rows = DB_numRows($result);
-
-				if ($num_rows == 0) {
-					continue;
-				}
-
-				$A = DB_fetchArray($result, FALSE);
-				$title = TAG_escape(stripslashes($A['sp_title']));
-				$title = TAG_escape($title);
-
-				// Gets the content of a staticpage
-				$sp_retval = '';
-				$mode      = '';
-				$args      = array(
-					'sp_id'  => $L['sid'],
-					'mode'   => $mode,
-					'gl_svc' => ''
+				$url = COM_buildURL(
+					$_CONF['site_url'] . '/article.php?story=' . $L['sid']
 				);
-				$svc_msg = array();
-
-				if (PLG_invokeService('staticpages', 'get', $args, $sp_retval, $svc_msg) == PLG_RET_OK) {
-					$content  = $sp_retval['sp_content'];
-					$all_tags = TAG_scanTag($content);
-					$url      = PLG_getItemInfo($L['type'], $L['sid'], 'url');
+				$type_name = $LANG09[6];
+			}
+		} else {
+			if (TAG_checkValidType($L['type']) == TRUE) {
+				$function = 'plugin_tag_gettaggeditems_' . $L['type'];
+				$item = $function($L['sid']);
+				
+				if (!empty($item)) {
+					$num_rows  = 1;
+					$title     = TAG_escape($item['title']);
+					$all_tags  = $item['all_tags'];
+					$url       = $item['url'];
+					$type_name = $item['type_name'];
 				}
-
-				break;
-
-			default:
-				continue;
-				break;
+			}
 		}
 
 		if ($num_rows > 0) {
@@ -1120,6 +1146,8 @@ function TAG_getTaggedItems($tag) {
 			$T->set_var('tag', TAG_escape($tag));
 			$T->set_var('related', TAG_str('related'));
 			$T->set_var('related_tags', TAG_formatRelatedTags($all_tags, $tag));
+			$T->set_var('lang_type', $LANG09[5]);
+			$T->set_var('val_type', $type_name);
 			$T->parse('output', 'item');
 			$retval .= $T->finish($T->get_var('output'));
 		}
@@ -1174,27 +1202,28 @@ function TAG_scanAllStories() {
 	global $_TABLES;
 
 	$sql = "SELECT sid, introtext, bodytext "
-		 . "  FROM {$_TABLES['stories']}";
+		 . "  FROM {$_TABLES['stories']} "
+		 . "WHERE ((draft_flag = 0) AND (date <= NOW())) ";
 	$result = DB_query($sql);
 
 	if (!DB_error()) {
-		$tags = array();
+		$all_tags = array();
 
 		while (($A = DB_fetchArray($result)) !== FALSE) {
-			$tags_in_introxtext = TAG_scanTag(stripslashes($A['introtext']));
-			$tags_in_bodytext   = TAG_scanTag(stripslashes($A['bodytext']));
-			$temp = array_merge($tags_in_introxtext, $tags_in_bodytext);
+			$tags1 = TAG_scanTag(stripslashes($A['introtext']));
+			$tags2 = TAG_scanTag(stripslashes($A['bodytext']));
+			$tags  = array_merge($tags1, $tags2);
 
-			if (count($temp) > 0) {
-				$tags[$A['sid']] = $temp;
+			if (count($tags) > 0) {
+				$all_tags[$A['sid']] = $tags;
 			}
 		}
 
-		if (count($tags) > 0) {
-			foreach ($tags as $sid => $tag) {
-				foreach ($tag as $t) {
-					TAG_saveTagToList($t);
-					TAG_saveTagToMap($t, $sid, 'article');
+		if (count($all_tags) > 0) {
+			foreach ($all_tags as $sid => $tags) {
+				foreach ($tags as $tag) {
+					TAG_saveTagToList($tag);
+					TAG_saveTagToMap($tag, $sid, 'article');
 				}
 			}
 		}
@@ -1259,8 +1288,16 @@ function TAG_scanAllStaticpages() {
 * Scans all types of contents supported by the Tag plugin
 */
 function TAG_scanAll() {
+	global $_PLUGINS;
+	
 	TAG_scanAllStories();
-	TAG_scanAllStaticpages();
+	
+	foreach ($_PLUGINS as $pi_name) {
+		if (TAG_checkValidType($pi_name) == TRUE) {
+			$function = 'plugin_tag_scanall_' . $pi_name;
+			$function();
+ 		}
+ 	}
 }
 
 /**
@@ -1291,7 +1328,7 @@ function TAG_getMenuList() {
 	while (($A = DB_fetchArray($result)) !== FALSE) {
 		$A['child'] = array();
 
-		if (trim($A['tag_ids']) == '') {
+		if (trim($A['tag_ids']) === '') {
 			$A['tag_ids'] = array();
 		} else {
 			$A['tag_ids'] = explode(',', $A['tag_ids']);
@@ -1331,7 +1368,7 @@ function TAG_getStoryTitle($sid) {
 		"(sid = '" . addslashes($sid) . "') " . COM_getPermSQL('AND')
 	);
 
-	if (!DB_error() AND ($title != '')) {
+	if (!DB_error() AND ($title !== '')) {
 		return stripslashes($title);
 	} else {
 		return '';
@@ -1414,7 +1451,7 @@ function TAG_buildTagMenu(&$nodes, &$node, $parent_tag_ids, $level) {
 * @return  string  HTML
 */
 function phpblock_tag_cloud($limit = 0) {
-	global $_CONF, $_TABLES, $_TAG_CONF;
+	global $_TAG_CONF;
 
 	// Checks the max number of clouds
 	$limit = (int) $limit;
@@ -1454,4 +1491,173 @@ function phpblock_tag_menu() {
 	$retval .= '</div>' . LB;
 
 	return $retval;
+}
+
+/**
+* Checks if the content type is valid
+*
+* @param   string  $type  item type
+* @return  boolean        TRUE = valid, FALSE = invalid
+*/
+function TAG_checkValidType($type) {
+	static $valids   = array('article'),
+		   $invalids = array();
+
+	if (in_array($type, $valids)) {
+		return TRUE;
+	} else if (in_array($type, $invalids)) {
+		return FALSE;
+	}
+
+	$type = strtolower($type);
+	
+	$retval = is_callable('plugin_tag_scantag_' . $type) AND
+			  is_callable('plugin_tag_scanall_' . $type) AND
+			  is_callable('plugin_tag_gettaggeditems_' . $type);
+	
+	if ($retval == TRUE) {
+		$valids[] = $type;
+	} else {
+		$invalids[] = $type;
+	}
+
+	return $retval;
+}
+
+/**
+* Checks if the current user is Tag Admin
+*/
+function TAG_checkAdmin() {
+	// Only lets admin users access this page
+	if (!SEC_hasRights('tag.admin')) {
+	    // Someone is trying to illegally access the current page
+	    COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
+		$content = COM_startBlock(TAG_str('access_denied'))
+				 . TAG_str('access_denied_msg')
+				 . COM_endBlock();
+		
+		if (is_callable('COM_createHTMLDocument')) {
+			$display = COM_createHTMLDocument($content);
+		} else {
+		    $display = COM_siteHeader() . $content . COM_endBlock();
+		}
+		
+	    COM_output($display);
+	    die(1);
+	}
+}
+
+/**
+* plugin_tag_***_staticpages functions provided by dengen
+*/
+global $_PLUGINS;
+
+if (in_array('staticpages', $_PLUGINS)) {
+	/**
+	* Scans all staticpages for tags
+	*
+	* @note  This is a very costly process, and should be used sparingly
+	*/
+	function plugin_tag_scanall_staticpages() {
+		$items = PLG_getItemInfo('staticpages', '*', 'id');
+		
+		foreach ($items as $item) {
+			// Gets the content of a staticpage
+			$sp_retval = '';
+			$args = array(
+				'sp_id'  => $item['id'],
+				'mode'   => '',
+				'gl_svc' => '',
+			);
+			$svc_msg = array();
+			
+			if (PLG_invokeService('staticpages', 'get', $args, $sp_retval, $svc_msg) != PLG_RET_OK) {
+				continue;
+			}
+
+			$tags = TAG_scanTag($sp_retval['sp_content']);
+			
+			foreach ($tags as $tag) {
+				TAG_saveTagToList($tag);
+				TAG_saveTagToMap($tag, $item['id'], 'staticpages');
+			}
+		}
+	}
+
+	/**
+	* Scans a staticpage for tags
+	*
+	*/
+	function plugin_tag_scantag_staticpages($id) {
+	    global $_TABLES;
+
+		$retval = array();
+
+		// Checks if the page is a template
+		$is_template = DB_getItem(
+			$_TABLES['staticpage'],
+			'template_flag',
+			"sp_id = '" . addslashes($id) . "'"
+		);
+		
+		if ($is_template == 1) {
+			return $retval;
+		}
+
+		// Gets the content of a staticpage
+		$sp_retval = '';
+		$args = array(
+			'sp_id'  => $id,
+			'mode'   => '',
+			'gl_svc' => '',
+		);
+		$svc_msg = array();
+		
+		if (PLG_invokeService('staticpages', 'get', $args, $sp_retval, $svc_msg) != PLG_RET_OK) {
+			return $retval;
+		}
+
+		$tags = TAG_scanTag($sp_retval['sp_content']);
+		$retval = array_unique($tags);
+
+	    return $retval;
+	}
+
+	/**
+	* Returns information for a tagged staticpage
+	*
+	*/
+	function plugin_tag_gettaggeditems_staticpages($id) {
+		global $_TABLES, $LANG_STATIC;
+
+		$retval = array();
+
+		$item = PLG_getItemInfo('staticpages', $id, 'title,url');
+		
+		if (empty($item)) {
+			return $retval;
+		}
+
+		// Gets the content of a staticpage
+		$sp_retval = '';
+		$args = array(
+			'sp_id'  => $id,
+			'mode'   => '',
+			'gl_svc' => '',
+		);
+		$svc_msg = array();
+		
+		if (PLG_invokeService('staticpages', 'get', $args, $sp_retval, $svc_msg) != PLG_RET_OK) {
+			return $retval;
+		}
+
+		$retval = array(
+			'title'     => $item[0],
+			'url'       => $item[1],
+			'all_tags'  => TAG_scanTag($sp_retval['sp_content']),
+			'type_name' => $LANG_STATIC['staticpages'],
+		);
+
+		return $retval;
+	}
 }

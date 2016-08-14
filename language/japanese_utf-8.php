@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------|
 // | geeklog/plugins/tag/language/japanese_utf-8.php                           |
 // +---------------------------------------------------------------------------|
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -30,7 +30,7 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------|
 
-$LANG_TAG = array (
+$LANG_TAG = array(
     'plugin'            => 'タグプラグイン',
 	'access_denied'     => 'アクセスは拒否されました。',
 	'access_denied_msg' => 'このページにアクセスできるのは，Rootユーザだけです。あなたのユーザ名とIPアドレスは記録されました。',

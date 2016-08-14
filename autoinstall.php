@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/autoinstall.php                                       |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2010-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2010-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // +---------------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------+
 
-if (strpos(strtolower($_SERVER['PHP_SELF']), strtolower(basename(__FILE__))) !== FALSE) {
+if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== FALSE) {
 	die('This file can not be used on its own!');
 }
 
@@ -53,30 +53,29 @@ function plugin_autoinstall_tag($pi_name) {
 		'pi_homepage'     => $_TAG_CONF['pi_url'],
 	);
 
-	$groups   = $_TAG_CONF['GROUPS'];
-	$features = $_TAG_CONF['FEATURES'];
-	$mappings = $_TAG_CONF['MAPPINGS'];
-
-	$tables = array('tag_list', 'tag_map', 'tag_badwords', 'tag_menu');
-
 	$inst_parms = array(
-		'info'      => $info,
-		'groups'    => $groups,
-		'features'  => $features,
-		'mappings'  => $mappings,
-		'tables'    => $tables
+		'info'      => 	array(
+							'pi_name'         => $pi_name,
+							'pi_display_name' => $pi_display_name,
+							'pi_version'      => $_TAG_CONF['pi_version'],
+							'pi_gl_version'   => $_TAG_CONF['pi_gl_version'],
+							'pi_homepage'     => $_TAG_CONF['pi_url'],
+						),
+		'groups'    => $_TAG_CONF['GROUPS'],
+		'features'  => $_TAG_CONF['FEATURES'],
+		'mappings'  => $_TAG_CONF['MAPPINGS'],
+		'tables'    => array('tag_list', 'tag_map', 'tag_badwords', 'tag_menu'),
 	);
 
 	return $inst_parms;
 }
 
 /**
-* Load plugin configuration from database
+* Loads plugin configuration from database
 *
 * @param    string  $pi_name    Plugin name
 * @return   boolean             TRUE on success, otherwise FALSE
 * @see      plugin_initconfig_tag
-*
 */
 function plugin_load_configuration_tag($pi_name)
 {
@@ -133,29 +132,62 @@ function plugin_postinstall_tag($pi_name) {
 	global $_CONF, $_TABLES, $_USER, $_TAG_CONF, $LANG_TAG;
 
 	require_once dirname(__FILE__) . '/functions.inc';
+	
+	if (is_callable('COM_createHTMLDocument')) {
+		// Adds a tag cloud block to the site
+		$sql = "INSERT INTO {$_TABLES['blocks']} "
+			 . "  (is_enabled, name, type, title, blockorder, onleft, "
+			 . "  phpblockfn, owner_id, group_id, perm_owner, perm_group, "
+			 . "  perm_members, perm_anon) "
+			 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name'])
+			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
+			 . "', 1, 0, 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
+			 . "', 1, 3, 3, 2, 2)";
+		DB_query($sql);
+		$bid = DB_insertId();
+		$sql = "INSERT INTO {$_TABLES['topic_assignments']} "
+			 . "  (tid, type, id, inherit, tdefault) "
+			 . "VALUES ('all', 'block', {$bid}, 1, 0) ";
+		DB_query($sql);
+		
+		// Adds a tag menu block to the site
+		$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, "
+			 . "  blockorder, onleft, phpblockfn, owner_id, group_id, "
+			 . "  perm_owner, perm_group, perm_members, perm_anon) "
+			 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name_menu'])
+			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
+			 . "', 1, 1, 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
+			 . "', 1, 3, 3, 2, 2)";
+		DB_query($sql);
+		$bid = DB_insertId();
+		$sql = "INSERT INTO {$_TABLES['topic_assignments']} "
+			 . "  (tid, type, id, inherit, tdefault) "
+			 . "VALUES ('all', 'block', {$bid}, 1, 0) ";
+		DB_query($sql);
+	} else {
+		// Adds a tag cloud block to the site
+		$sql = "INSERT INTO {$_TABLES['blocks']} "
+			 . "  (is_enabled, name, type, title, tid, blockorder, onleft, "
+			 . "  phpblockfn, owner_id, group_id, perm_owner, perm_group, "
+			 . "  perm_members, perm_anon) "
+			 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name'])
+			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
+			 . "', 'all', '1', '0', 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
+			 . "', '1', '3', '3', '2', '2')";
+		DB_query($sql);
 
-	// Adds a tag cloud block to the site
-	$sql = "INSERT INTO {$_TABLES['blocks']} "
-		 . "  (is_enabled, name, type, title, tid, blockorder, onleft, "
-		 . "  phpblockfn, owner_id, group_id, perm_owner, perm_group, "
-		 . "  perm_members, perm_anon) "
-		 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name'])
-		 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
-		 . "', 'all', '1', '0', 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
-		 . "', '1', '3', '3', '2', '2')";
-	DB_query($sql);
-
-	// Adds a tag menu block to the site
-	$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, "
-		 . "  tid, blockorder, onleft, phpblockfn, owner_id, group_id, "
-		 . "  perm_owner, perm_group, perm_members, perm_anon) "
-		 . "VALUES ('1', '" . addslashes($_TAG_CONF['default_block_name_menu'])
-		 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
-		 . "', 'all', '1', '1', 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
-		 . "', '1', '3', '3', '2', '2')";
-	DB_query($sql);
-
-	// Scans all contents
+		// Adds a tag menu block to the site
+		$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, "
+			 . "  tid, blockorder, onleft, phpblockfn, owner_id, group_id, "
+			 . "  perm_owner, perm_group, perm_members, perm_anon) "
+			 . "VALUES ('1', '" . addslashes($_TAG_CONF['default_block_name_menu'])
+			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
+			 . "', 'all', '1', '1', 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
+			 . "', '1', '3', '3', '2', '2')";
+		DB_query($sql);
+	}
+	
+	// Scans all contents for tags
 	TAG_scanAll();
 
 	return TRUE;

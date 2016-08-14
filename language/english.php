@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------|
 // | geeklog/plugins/tag/language/english.php                                  |
 // +---------------------------------------------------------------------------|
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |

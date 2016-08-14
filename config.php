@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/config.php                                            |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -33,12 +33,10 @@
 
 global $_DB_table_prefix, $_TABLES, $_TAG_CONF;
 
-// set Plugin Table Prefix the Same as Geeklogs
-
+// Sets plugin table prefix the same as Geeklog's
 $_TAG_table_prefix = $_DB_table_prefix;
 
-// Add to $_TABLES array the tables your plugin uses
-
+// Adds to $_TABLES array the tables your plugin uses
 $_TABLES['tag_list']      = $_TAG_table_prefix . 'tag_list';
 $_TABLES['tag_map']       = $_TAG_table_prefix . 'tag_map';
 $_TABLES['tag_badwords']  = $_TAG_table_prefix . 'tag_badwords';
@@ -47,8 +45,7 @@ $_TABLES['tag_menu']      = $_TAG_table_prefix . 'tag_menu';
 $_TAG_CONF = array();
 
 // Plugin info
-
-$_TAG_CONF['pi_version']    = '0.5.4';					// Plugin Version
+$_TAG_CONF['pi_version']    = '0.6.0';					// Plugin Version
 $_TAG_CONF['pi_gl_version'] = '1.7.1';					// GL Version plugin for
 $_TAG_CONF['pi_url']        = 'http://mystral-kk.net/';	// Plugin Homepage
 

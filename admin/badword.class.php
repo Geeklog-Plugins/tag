@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/badword.class.php                           |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -33,22 +33,14 @@
 
 require_once '../../../lib-common.php';
 
-/**
-* Only let admin users access this page
-*/
-if (!SEC_hasRights('tag.admin')) {
-    /**
-	* Someone is trying to illegally access this page
-	*/
-    COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
-    $display = COM_siteHeader()
-			 . COM_startBlock(TAG_str('access_denied'))
-			 . TAG_str('access_denied_msg')
-			 . COM_endBlock()
-			 . COM_siteFooter();
-    COM_output($display);
-    exit;
+global $_CONF, $_PLUGINS;
+
+if (!in_array('tag', $_PLUGINS)) {
+	COM_output(COM_refresh($_CONF['site_url'] . '/index.php'));
+	exit;
 }
+
+TAG_checkAdmin();
 
 /**
 * Main 

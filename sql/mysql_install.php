@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/sql/mysql_install.php                                 |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2010-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2010-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // +---------------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------+
 
-if (strpos(strtolower($_SERVER['PHP_SELF']), strtolower(basename(__FILE__))) !== FALSE) {
+if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== FALSE) {
     die('This file can not be used on its own!');
 }
 
@@ -33,7 +33,7 @@ $_SQL[] = "
 CREATE TABLE {$_TABLES['tag_list']} (
 	tag_id MEDIUMINT(10) NOT NULL AUTO_INCREMENT,
 	tag VARCHAR(255) NOT NULL DEFAULT '',
-	hits MEDIUMINT(10) NOT NULL DEFAULT '0',
+	hits MEDIUMINT(10) NOT NULL DEFAULT 0,
 	PRIMARY KEY tag_id(tag_id)
 ) ENGINE=MyISAM
 ";
@@ -45,7 +45,7 @@ CREATE INDEX idx_tag_list_tag ON {$_TABLES['tag_list']} (tag)
 $_SQL[] = "
 CREATE TABLE {$_TABLES['tag_map']} (
 	map_id MEDIUMINT(10) NOT NULL AUTO_INCREMENT,
-	tag_id MEDIUMINT(10) NOT NULL DEFAULT '0',
+	tag_id MEDIUMINT(10) NOT NULL DEFAULT 0,
 	type VARCHAR(30) NOT NULL DEFAULT 'article',
 	sid VARCHAR(40) NOT NULL DEFAULT '',
 	PRIMARY KEY map_id(map_id)
@@ -68,8 +68,8 @@ CREATE TABLE {$_TABLES['tag_menu']} (
 	menu_id INT(10) NOT NULL AUTO_INCREMENT,
 	menu_name VARCHAR(255) NOT NULL DEFAULT '',
 	tag_ids VARCHAR(255) NOT NULL DEFAULT '',
-	parent_id INT(10) NOT NULL DEFAULT '0',
-	dsp_order INT(10) NOT NULL DEFAULT '0',
+	parent_id INT(10) NOT NULL DEFAULT 0,
+	dsp_order INT(10) NOT NULL DEFAULT 0,
 	PRIMARY KEY menu_id(menu_id)
 ) ENGINE=MyISAM
 ";

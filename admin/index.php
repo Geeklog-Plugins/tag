@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/index.php                                   |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -34,57 +34,42 @@
 require_once '../../../lib-common.php';
 require_once $_CONF['path_system'] . 'classes/navbar.class.php';
 
-if (!defined('XHTML')) {
-	define('XHTML', '');
+if (!in_array('tag', $_PLUGINS)) {
+	COM_output(COM_refresh($_CONF['site_url'] . '/index.php'));
+	exit;
 }
 
-/**
-* Only lets admin users access this page
-*/
-if (!SEC_hasRights('tag.admin')) {
-    /**
-	* Someone is trying to illegally access this page
-	*/
-    COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
-    $display = COM_siteHeader()
-			 . COM_startBlock($LANG_TAG['access_denied'])
-			 . $LANG_TAG['access_denied_msg']
-			 . COM_endBlock()
-			 . COM_siteFooter(true);
-    COM_output($display);
-    exit;
-}
+TAG_checkAdmin();
 
-/**
-* Main 
-*/
+// Main
 $this_script = $_CONF['site_admin_url'] . '/plugins/tag/index.php';
 $commands = array('stats', 'badword', 'menuconfig');
 $actions  = array('view', 'add', 'edit', 'delete', 'doAdd', 'doEdit', 'doDelete');
 
-/**
-* Retrieves request vars
-*/
+// Retrieves request vars
 $cmd = TAG_get('cmd');
+
 if ($cmd === FALSE) {
 	$cmd = TAG_post('cmd');
 }
+
 if (($cmd === FALSE) OR !in_array($cmd, $commands)) {
 	$cmd = 'stats';
 }
 
 $action = TAG_get('action');
+
 if ($action === FALSE) {
 	$action = TAG_post('action', true);
 }
+
 if (($action === FALSE) OR !in_array($action, $actions)) {
 	$action = 'view';
 }
 
-/**
-* Processes command
-*/
+// Processes command
 require_once $cmd . '.class.php';
+
 $class = 'Tag' . ucfirst($cmd);
 $obj = new $class;
 
@@ -109,7 +94,6 @@ switch ($action) {
 /**
 * Display
 */
-$display = COM_siteHeader();
 $T = new Template($_CONF['path'] . 'plugins/tag/templates');
 $T->set_file('admin', 'admin.thtml');
 $T->set_var('xhtml', XHTML);
@@ -117,13 +101,11 @@ $T->set_var('header', TAG_str('admin'));
 $T->set_var('config_url', $_CONF['site_admin_url'] . '/configuration.php');
 $T->set_var('lang_config', TAG_str('config'));
 
-if ($msg != '') {
+if ($msg !== '') {
 	$T->set_var('msg', '<p>' . $msg . '</p>');
 }
 
-/**
-* Navbar
-*/
+// Navbar
 $navbar = new navbar;
 
 foreach ($commands as $menu_item) {
@@ -136,9 +118,7 @@ foreach ($commands as $menu_item) {
 $navbar->set_selected(TAG_str('menu_' . $cmd), $cmd);
 $T->set_var('navbar', $navbar->generate());
 
-/**
-* Menu
-*/
+// Menu
 switch ($action) {
 	case 'add':
 		$content = $obj->add();
@@ -162,6 +142,12 @@ switch ($action) {
 
 $T->set_var('content', $content);
 $T->parse('output', 'admin');
-$display .= $T->finish($T->get_var('output'))
-		 .  COM_siteFooter();
+$content = $T->finish($T->get_var('output'));
+
+if (is_callable('COM_createHTMLDocument')) {
+	$display = COM_createHTMLDocument($content);
+} else {
+	$display = COM_siteHeader() . $content . COM_siteFooter();
+}
+
 COM_output($display);

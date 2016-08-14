@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/tag/menu.php                                                  |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -33,17 +33,17 @@
 
 require_once '../lib-common.php';
 
-if (!defined('XHTML')) {
-	define('XHTML', '');
+if (!in_array('tag', $_PLUGINS)) {
+	COM_output(COM_refresh($_CONF['site_url'] . '/index.php'));
+	exit;
 }
 
-/**
-* Retrieve request vars
-*/
+// Retrieves request vars
 COM_setArgNames(array('tag'));
 $tag  = COM_getArgument('tag');
 $tags = explode('_', COM_applyFilter($tag));
-if (count($tags) == 0) {
+
+if (count($tags) === 0) {
 	COM_refresh($_CONF['site_url'] . '/index.php');
 	exit;
 }
@@ -51,14 +51,11 @@ if (count($tags) == 0) {
 /**
 * Display
 */
-$display = COM_siteHeader();
 $T = new Template($_CONF['path'] . 'plugins/tag/templates');
 $T->set_file('page', 'menu.thtml');
 $T->set_var('xhtml', XHTML);
 
-/**
-* Lang vars
-*/
+// Lang vars
 $lang_vars = array('tag_list');
 
 foreach ($lang_vars as $lang_var) {
@@ -67,28 +64,31 @@ foreach ($lang_vars as $lang_var) {
 
 $tag_menu = array();
 $sql = "SELECT type, sid, COUNT(sid) AS cnt "
-	 . "FROM {$_TABLES['tag_map']} "
+	 . "  FROM {$_TABLES['tag_map']} "
 	 . "WHERE (tag_id IN ('" . implode("','", array_map('addslashes', $tags)) . "')) "
 	 . "GROUP BY type, sid "
 	 . "HAVING cnt = '" . addslashes(count($tags)) . "'";
 $result = DB_query($sql);
+
 if (!DB_error()) {
-	while (($A = DB_fetchArray($result)) !== false) {
+	while (($A = DB_fetchArray($result)) !== FALSE) {
 		$url   = '';
 		$title = '';
 		$item  = '<li><a href="';
 
 		switch ($A['type']) {
 			case 'article':
-				/* Fall through to default */
+				/* Falls through to default */
 
 			default:
-				$url = COM_buildURL($_CONF['site_url'] . '/article.php?story=' . TAG_escape($A['sid']));
+				$url = COM_buildURL(
+					$_CONF['site_url'] . '/article.php?story=' . TAG_escape($A['sid'])
+				);
 				$title = TAG_getStoryTitle($A['sid']);
 				break;
 		}
 
-		if ($url == '') {
+		if ($url === '') {
 			continue;
 		}
 
@@ -106,7 +106,8 @@ if (count($tag_menu) > 0) {
 }
 
 $tags = array_map('TAG_getTagName', $tags);
-if ($_TAG_CONF['replace_underscore'] === true) {
+
+if ($_TAG_CONF['replace_underscore'] === TRUE) {
 	$temp = array();
 
 	foreach ($tags as $tag) {
@@ -127,6 +128,12 @@ $T->set_var(
 );
 $T->set_var('tag_menu', $tag_menu);
 $T->parse('output', 'page');
-$display .= $T->finish($T->get_var('output'))
-		 .  COM_siteFooter();
+$content = $T->finish($T->get_var('output'));
+
+if (is_callable('COM_createHTMLDocument')) {
+	$display = COM_createHTMLDocument($content);
+} else {
+	$display = COM_siteHeader() . $content . COM_siteFooter();
+}
+
 COM_output($display);

@@ -77,7 +77,7 @@
 		</tr>
 		<tr>
 			<th>Version</th>
-			<td>0.5.4</td>
+			<td>0.6.0</td>
 		</tr>
 		<tr>
 			<th>Required Geeklog Version</th>
@@ -251,6 +251,20 @@
 			<th>Description</th>
 		</tr>
 		<tr>
+			<td class="center">0.6.0</td>
+			<td class="center">2012-06-17</td>
+			<td>
+				<span class="new">New</span> Upgraded to work with Geeklog-2.0.0.<br>
+				<span class="new">New</span> Created 3 new API calls to enable other plugins to define and display tags in their contents.  Thanks for the idea, dengen!<br>
+				<ul>
+					<li>function plugin_tag_scanall_<strong>pluginname</strong>()</li>
+					<li>plugin_tag_scantag_<strong>pluginname</strong>($id)</li>
+					<li>plugin_tag_gettaggeditems_<strong>pluginname</strong>($id)</li>
+				</ul>
+				Please see "geeklog/plugins/tag/functions.inc" for examples of the staticpages plugin provided by dengen.
+			</td>
+		</tr>
+		<tr>
 			<td class="center">0.5.4</td>
 			<td class="center">2011-10-02</td>
 			<td>
@@ -348,6 +362,6 @@
 		</tr>
 	</table>
 	
-	<p id="copyright">Copyright &copy; 2006-2011 mystral-kk</p>
+	<p id="copyright">Copyright &copy; 2006-2012 mystral-kk</p>
 </body>
 </html>
