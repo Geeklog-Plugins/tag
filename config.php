@@ -50,7 +50,7 @@ $_TAG_CONF = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version'] = '0.3.0';						// Plugin Version
+$_TAG_CONF['pi_version'] = '0.3.1';						// Plugin Version
 $_TAG_CONF['gl_version'] = '1.4.0';						// GL Version plugin for
 $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 
@@ -179,5 +179,12 @@ $_TAG_CONF['default_block_name_menu'] = 'tag_menu_block';
 * Character(s) for indenting tag menu item
 */
 $_TAG_CONF['menu_indenter'] = '&nbsp;&nbsp;&nbsp;';
+
+/**
+* Whether to add the number of items to each tag menu item
+*
+* @note This feature could be a costly operation
+*/
+$_TAG_CONF['add_num_items_to_menu'] = false;
 
 ?>

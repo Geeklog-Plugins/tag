@@ -170,18 +170,12 @@ function plugin_upgrade_tag() {
 			DB_query($sql);
 			$sql = "CREATE INDEX idx_tag_map_tag_id ON {$_TABLES['tag_map']} (tag_id)";
 			DB_query($sql);
-
-			/* Fall through to the next 'case' */
+			/* Fall through into the next case */
+			
 		case '0.2.0':	// 0.2.0 --> 0.3.0
-			$sql = "CREATE TABLE " . $_TABLES['tag_menu'] . " ("
-				 . "menu_id INT(10) NOT NULL AUTO_INCREMENT,"
-				 . "menu_name VARCHAR(255) NOT NULL DEFAULT '',"
-				 . "tag_ids VARCHAR(255) NOT NULL DEFAULT '',"
-				 . "parent_id INT(10) NOT NULL DEFAULT '0',"
-				 . "dsp_order INT(10) NOT NULL DEFAULT '0',"
-				 . "PRIMARY KEY menu_id(menu_id)"
-				 . ")";
-			DB_query($sql);
+			/* Fall through into the next case */
+		
+		case '0.3.0':	// 0.3.0 --> 0.3.1
 			break;
 		
 		default:
@@ -1240,6 +1234,29 @@ function TAG_getStoryTitle($sid) {
 }
 
 /**
+* Return the number of items which include all the tag ids
+*
+* @param  array of int $tag_ids - array of tag ids
+* @return int                   - the number of items
+*/
+function TAG_getNumItems($tag_ids) {
+	global $_TABLES;
+	
+	$sql = "SELECT COUNT(sid) AS cnt "
+		 . "FROM {$_TABLES['tag_map']} "
+		 . "WHERE (tag_id IN ('" . implode("','", array_map('addslashes', $tag_ids))
+		 . "')) "
+		 . "GROUP BY sid "
+		 . "HAVING cnt = " . count($tag_ids);
+	$result = DB_query($sql);
+	if (DB_error()) {
+		return 'N/A';
+	} else {
+		return DB_numRows($result);
+	}
+}
+
+/**
 * Build a tag menu
 *
 * @access private
@@ -1257,8 +1274,16 @@ function TAG_buildTagMenu(&$nodes, &$node, $parent_tag_ids, $level) {
 	
 	$retval .= str_repeat($_TAG_CONF['menu_indenter'], $level)
 			.  '<a class="bl_tag_menu_item" href="' . COM_buildURL($url) . '">'
-			. TAG_escape($node['menu_name']) . '</a><br' . XHTML . '>' . LB;
+			. TAG_escape($node['menu_name']) . '</a>';
 	
+	// Add the number of items
+	if ($_TAG_CONF['add_num_items_to_menu'] === true) {
+		$retval .= ' (' . COM_numberFormat(TAG_getNumItems($tag_ids)) . ')';
+	}
+	
+	$retval .= '<br' . XHTML . '>' . LB;
+	
+	// Build child items recursively
 	foreach ($node['child'] as $child) {
 		$retval .= TAG_buildTagMenu($nodes, $nodes[$child], $tag_ids, $level + 1);
 	}
