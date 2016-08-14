@@ -165,7 +165,7 @@ function plugin_upgrade_tag() {
 		    */
 		    if ((version_compare($pi_version, '0.4.0') < 0)
 			 AND (version_compare(VERSION, '1.5') >= 0)) {
-		        require_once $_CONF['path'] . 'plugins/themedit/install_defaults.php';
+		        require_once $_CONF['path'] . 'plugins/tag/install_defaults.php';
 		        plugin_initconfig_tag();
 		    }
 			
@@ -177,6 +177,9 @@ function plugin_upgrade_tag() {
 		    $c = config::get_instance();
 	        $c->add('hidetagmenu', FALSE, 'select', 0, 0, 0, 5, TRUE, 'tag');
 			
+			/* Fall through into the next case */
+			
+		case '0.5.0':
 			break;
 		
 		default:
@@ -296,7 +299,11 @@ function TAG_loadConfig() {
     require_once $_CONF['path_system'] . 'classes/config.class.php';
 	
     $config = config::get_instance();
-    $_TAG_CONF = array_merge($_TAG_CONF, $config->get_config('tag'));
+	$config_data = $config->get_config('tag');
+	
+	if (is_array($config_data) AND (count($config_data) > 0)) {
+    	$_TAG_CONF = array_merge($_TAG_CONF, $config_data);
+	}
 }
 
 /**
