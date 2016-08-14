@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | private/plugins/tag/functions.inc                                         |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -173,13 +173,20 @@ function plugin_upgrade_tag() {
 		
 		case '0.4.1':
 			require_once $_CONF['path_system'] . 'classes/config.class.php';
+	        require_once $_CONF['path'] . 'plugins/tag/install_defaults.php';
 			
 		    $c = config::get_instance();
-	        $c->add('hidetagmenu', FALSE, 'select', 0, 0, 0, 5, TRUE, 'tag');
+	        $c->add('hidetagmenu', $_TAG_DEFAULT['hidetagmenu'], 'select', 0, 0, 0, 5, TRUE, 'tag');
 			
 			/* Fall through into the next case */
 			
 		case '0.5.0':
+		case '0.5.1':
+			require_once $_CONF['path_system'] . 'classes/config.class.php';
+	        require_once $_CONF['path'] . 'plugins/tag/install_defaults.php';
+			
+		    $c = config::get_instance();
+			$c->add('tag_cloud_threshold_max_count', $_TAG_DEFAULT['tag_cloud_threshold_max_count'], 'text', 0, 0, NULL, 105, TRUE, 'tag');
 			break;
 		
 		default:
@@ -862,23 +869,51 @@ function plugin_itemsaved_tag($id, $type, $old_id = '') {
 }
 
 /**
-* Gets the level of a tag
+* Gets the level of a tag.  Once $count reaches the max level
+* (= $_TAG_CONF['tag_cloud_threshold'][9]), then we use use percentages based
+* on the thresholds.
 *
 * @param   int  $count  the number of a given tag
 * @return  int          the corresponding level(0..9)
 */
 function TAG_getLevel($count) {
-	global $_TAG_CONF;
+	global $_TABLES, $_TAG_CONF;
 	
 	$count = intval($count);
+	$total_tag_count = DB_getItem($_TABLES['tag_map'], 'COUNT(map_id) AS cnt', '');
 	
-	for ($i = 0; $i <= 9; $i ++) {
-		if ($count <= $_TAG_CONF['tag_cloud_threshold'][$i]) {
-			return $i;
+	if ($total_tag_count > 0) {
+		if ($total_tag_count <= $_TAG_CONF['tag_cloud_threshold_max_count']) {
+			/**
+			* Old way: we use thresholds based on the set number of tags.  We
+			* might as well add a switch here to use this as percentages,
+			* though it really would not when there are only a few tags in the
+			* system.
+			*/
+			for ($i = 0; $i <= 9; $i ++) {
+				if ($count <= $_TAG_CONF['tag_cloud_threshold'][$i]) {
+					return $i;
+				}
+			}
+			
+			return 9;
+		} else {
+			/**
+			* New way: we use thresholds based on percentages.
+			*/
+			$percentage = intval(100.0 * ($count / $total_tag_count));
+			
+			for ($i = 0; $i <= 9; $i ++) {
+				if ($percentage <= $_TAG_CONF['tag_cloud_threshold'][$i]) {
+					return $i;
+				}
+			}
+			
+			return 9;
 		}
 	}
 	
-	return 9;
+	return 0;
 }
 
 /**
@@ -1017,13 +1052,14 @@ function TAG_getTaggedItems($tag) {
 					 . COM_getPermSQL('AND');
 				$result = DB_query($sql);
 				
-				if (DB_numRows($result) == 0) {
+				$num_rows = DB_numRows($result);
+				if ($num_rows == 0) {
 					continue;
 				}
 
 				$A = DB_fetchArray($result);
 				$title = TAG_escape(stripslashes($A['title']));
-				$body  = stripslashes($A['introtext']) . '<br>'
+				$body  = stripslashes($A['introtext']) . '<br' . XHTML . '>'
 					   . stripslashes($A['bodytext']);
 				$all_tags = TAG_scanTag($body);
 				$url = COM_buildURL($_CONF['site_url'] . '/article.php?story=' . $L['sid']);
@@ -1040,10 +1076,11 @@ function TAG_getTaggedItems($tag) {
 					 . COM_getPermSQL('AND');
 				$result = DB_query($sql);
 				
-				if (DB_numRows($result) == 0) {
+				$num_rows = DB_numRows($result);
+				if ($num_rows == 0) {
 					continue;
 				}
-
+				
 				$A = DB_fetchArray($result);
 				$title = TAG_escape(stripslashes($A['sp_title']));
 				$content  = stripslashes($A['sp_content']);
@@ -1056,13 +1093,15 @@ function TAG_getTaggedItems($tag) {
 				break;
 		}
 		
-		$T->set_var('title', $title);
-		$T->set_var('url', $url);
-		$T->set_var('tag', TAG_escape($tag));
-		$T->set_var('related', TAG_str('related'));
-		$T->set_var('related_tags', TAG_formatRelatedTags($all_tags, $tag));
-		$T->parse('output', 'item');
-		$retval .= $T->finish($T->get_var('output'));
+		if ($num_rows != 0) {
+			$T->set_var('title', $title);
+			$T->set_var('url', $url);
+			$T->set_var('tag', TAG_escape($tag));
+			$T->set_var('related', TAG_str('related'));
+			$T->set_var('related_tags', TAG_formatRelatedTags($all_tags, $tag));
+			$T->parse('output', 'item');
+			$retval .= $T->finish($T->get_var('output'));
+		}
 	}
 	
 	return $retval;

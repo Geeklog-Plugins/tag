@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/config.php                                            |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -129,16 +129,22 @@ $_TAG_DEFAULT['max_tag_cloud_in_block'] = 20;
 * Style Sheet), so you can display in different styles tags according to their
 * levels.
 */
-$_TAG_DEFAULT['tag_cloud_threshold'][0]  = 1;
-$_TAG_DEFAULT['tag_cloud_threshold'][1]  = 2;
-$_TAG_DEFAULT['tag_cloud_threshold'][2]  = 3;
-$_TAG_DEFAULT['tag_cloud_threshold'][3]  = 4;
-$_TAG_DEFAULT['tag_cloud_threshold'][4]  = 5;
-$_TAG_DEFAULT['tag_cloud_threshold'][5]  = 6;
-$_TAG_DEFAULT['tag_cloud_threshold'][6]  = 7;
-$_TAG_DEFAULT['tag_cloud_threshold'][7]  = 8;
-$_TAG_DEFAULT['tag_cloud_threshold'][8]  = 9;
+$_TAG_DEFAULT['tag_cloud_threshold'][0]  =  1;
+$_TAG_DEFAULT['tag_cloud_threshold'][1]  =  2;
+$_TAG_DEFAULT['tag_cloud_threshold'][2]  =  3;
+$_TAG_DEFAULT['tag_cloud_threshold'][3]  =  4;
+$_TAG_DEFAULT['tag_cloud_threshold'][4]  =  5;
+$_TAG_DEFAULT['tag_cloud_threshold'][5]  =  6;
+$_TAG_DEFAULT['tag_cloud_threshold'][6]  =  7;
+$_TAG_DEFAULT['tag_cloud_threshold'][7]  =  8;
+$_TAG_DEFAULT['tag_cloud_threshold'][8]  =  9;
 $_TAG_DEFAULT['tag_cloud_threshold'][9]  = 10;
+
+/**
+* Uses thresholds until this number of tags is reached then a percentage system
+* is used.  Thanks, Tom, for suggesting this!
+*/
+$_TAG_DEFAULT['tag_cloud_threshold_max_count'] = 20;
 
 /**
 * Whether to replace an underscore included in tag texts with a space
@@ -215,24 +221,25 @@ function plugin_initconfig_tag() {
         /**
         * Main
         */
-        $c->add('hidetagmenu', $_TAG_DEFAULT['hidetagmenu'], 'select', 0, 0, 0, 5, TRUE, $me);
-        $c->add('default_block_name', $_TAG_DEFAULT['default_block_name'], 'text', 0, 0, NULL, 10, TRUE, $me);
-        $c->add('tag_name', $_TAG_DEFAULT['tag_name'], 'text', 0, 0, NULL, 20, TRUE, $me);
-        $c->add('max_tag_len', $_TAG_DEFAULT['max_tag_len'], 'text', 0, 0, null, 30, TRUE, $me);
-        $c->add('tag_case_sensitive', $_TAG_DEFAULT['tag_case_sensitive'], 'select', 0, 0, 0, 40, TRUE, $me);
-        $c->add('tag_stemming', $_TAG_DEFAULT['tag_stemming'], 'select', 0, 0, 0, 50, TRUE, $me);
-        $c->add('tag_check_badword', $_TAG_DEFAULT['tag_check_badword'], 'select', 0, 0, 0, 60, TRUE, $me);
-        $c->add('tag_cloud_spacer', $_TAG_DEFAULT['tag_cloud_spacer'], 'text', 0, 0, null, 70, TRUE, $me);
-        $c->add('max_tag_cloud', $_TAG_DEFAULT['max_tag_cloud'], 'text', 0, 0, null, 80, TRUE, $me);
-        $c->add('max_tag_cloud_in_block', $_TAG_DEFAULT['max_tag_cloud_in_block'], 'text', 0, 0, null, 90, TRUE, $me);
-        $c->add('tag_cloud_threshold', $_TAG_DEFAULT['tag_cloud_threshold'], '%text', 0, 0, null, 100, TRUE, $me);
-        $c->add('replace_underscore', $_TAG_DEFAULT['replace_underscore'], 'select', 0, 0, 0, 110, TRUE, $me);
-        $c->add('num_keywords', $_TAG_DEFAULT['num_keywords'], 'text', 0, 0, NULL, 110, TRUE, $me);
-        $c->add('publish_as_template_vars', $_TAG_DEFAULT['publish_as_template_vars'], 'select', 0, 0, 0, 120, TRUE, $me);
-        $c->add('default_block_name_menu', $_TAG_DEFAULT['default_block_name_menu'], 'text', 0, 0, NULL, 130, TRUE, $me);
-        $c->add('menu_indenter', $_TAG_DEFAULT['menu_indenter'], 'text', 0, 0, NULL, 140, TRUE, $me);
-        $c->add('add_num_items_to_menu', $_TAG_DEFAULT['add_num_items_to_menu'], 'select', 0, 0, 0, 140, TRUE, $me);
-    }
-    
+		$c->add('hidetagmenu', $_TAG_DEFAULT['hidetagmenu'], 'select', 0, 0, 0, 5, TRUE, $me);
+		$c->add('default_block_name', $_TAG_DEFAULT['default_block_name'], 'text', 0, 0, NULL, 10, TRUE, $me);
+		$c->add('tag_name', $_TAG_DEFAULT['tag_name'], 'text', 0, 0, NULL, 20, TRUE, $me);
+		$c->add('max_tag_len', $_TAG_DEFAULT['max_tag_len'], 'text', 0, 0, NULL, 30, TRUE, $me);
+		$c->add('tag_case_sensitive', $_TAG_DEFAULT['tag_case_sensitive'], 'select', 0, 0, 0, 40, TRUE, $me);
+		$c->add('tag_stemming', $_TAG_DEFAULT['tag_stemming'], 'select', 0, 0, 0, 50, TRUE, $me);
+		$c->add('tag_check_badword', $_TAG_DEFAULT['tag_check_badword'], 'select', 0, 0, 0, 60, TRUE, $me);
+		$c->add('tag_cloud_spacer', $_TAG_DEFAULT['tag_cloud_spacer'], 'text', 0, 0, NULL, 70, TRUE, $me);
+		$c->add('max_tag_cloud', $_TAG_DEFAULT['max_tag_cloud'], 'text', 0, 0, NULL, 80, TRUE, $me);
+		$c->add('max_tag_cloud_in_block', $_TAG_DEFAULT['max_tag_cloud_in_block'], 'text', 0, 0, NULL, 90, TRUE, $me);
+		$c->add('tag_cloud_threshold', $_TAG_DEFAULT['tag_cloud_threshold'], '%text', 0, 0, NULL, 100, TRUE, $me);
+		$c->add('tag_cloud_threshold_max_count', $_TAG_DEFAULT['tag_cloud_threshold_max_count'], 'text', 0, 0, NULL, 105, TRUE, $me);
+		$c->add('replace_underscore', $_TAG_DEFAULT['replace_underscore'], 'select', 0, 0, 0, 110, TRUE, $me);
+		$c->add('num_keywords', $_TAG_DEFAULT['num_keywords'], 'text', 0, 0, NULL, 110, TRUE, $me);
+		$c->add('publish_as_template_vars', $_TAG_DEFAULT['publish_as_template_vars'], 'select', 0, 0, 0, 120, TRUE, $me);
+		$c->add('default_block_name_menu', $_TAG_DEFAULT['default_block_name_menu'], 'text', 0, 0, NULL, 130, TRUE, $me);
+		$c->add('menu_indenter', $_TAG_DEFAULT['menu_indenter'], 'text', 0, 0, NULL, 140, TRUE, $me);
+		$c->add('add_num_items_to_menu', $_TAG_DEFAULT['add_num_items_to_menu'], 'select', 0, 0, 0, 140, TRUE, $me);
+	}
+	
     return TRUE;
 }

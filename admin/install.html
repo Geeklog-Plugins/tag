@@ -77,7 +77,7 @@
 		</tr>
 		<tr>
 			<th>Version</th>
-			<td>0.5.1</td>
+			<td>0.5.2</td>
 		</tr>
 		<tr>
 			<th>Required Geeklog Version</th>
@@ -211,6 +211,11 @@
 			<td>Thresholds of frequency of each tag cloud level.  All tag clouds are classified in 10 levels (Level 0..Level 9).  Those tags whose number is equal to or smaller than the level are considered to belong to the level.  Each level corresponds to its own class in CSS(Cascading Style Sheet), so you can display in different styles tags according to their levels.</td>
 		</tr>
 		<tr>
+			<td><a name="desc_tag_cloud_threshold_max_count">Threshold of percentage-based system</td>
+			<td>20</td>
+			<td>This is the maximum number of tag count over which we switch to the percentage-based threshold system.  Once the number of a given tag reaches the threshold, we calculate the tag level based not on the number of the tag itself but on the percentage of the frequency of the tag.  You can change the threshold in the configuration("Threshold of percentage-based system").  If you don't want to use the new percentage-based threshold system, set a very large number, say, 999999.    Thanks, Tom!</td>
+		</tr>
+		<tr>
 			<td><a name="desc_replace_underscore">Replace an underscore with a space</a>('replace_underscore')</td>
 			<td>false</td>
 			<td>Whether to replace an underscore included in tag texts with a space when a tag is displayed.</td>
@@ -242,8 +247,16 @@
 	<table>
 		<tr>
 			<th>Version</th>
-			<th>Date</th>
+			<th style="width: 5em;">Date</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="center">0.5.2</td>
+			<td class="center">2011-01-04</td>
+			<td>
+				<span class="fix">Fix</span> Fixed an error when there is no item to diplay.  Thanks, Tom!<br>
+				<span class="new">New</span> Introduced a new configuration item to switch to the percentage-based threshold system.  See <a href="#desc_tag_cloud_threshold_max_count">the above</a> for further information.  Thanks, Tom!
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.5.1</td>
@@ -314,6 +327,6 @@
 		</tr>
 	</table>
 	
-	<p id="copyright">Copyright &copy; 2006-2010 mystral-kk</p>
+	<p id="copyright">Copyright &copy; 2006-2011 mystral-kk</p>
 </body>
 </html>

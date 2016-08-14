@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/sql/mysql_install.php                                 |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2010 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2010-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // +---------------------------------------------------------------------------+

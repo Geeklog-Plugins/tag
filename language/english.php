@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------|
 // | geeklog/plugins/tag/language/english.php                                  |
 // +---------------------------------------------------------------------------|
-// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -107,23 +107,24 @@ $LANG_configsections['tag'] = array(
 * For Config UI
 */
 $LANG_confignames['tag'] = array(
-	'hidetagmenu'				=> 'Hide Tag Menu entry',
-	'default_block_name'		=> 'Default name for Tag Cloud Block',
-	'tag_name'					=> 'Tag name',
-	'max_tag_len'				=> 'Max length of tag in bytes',
-	'tag_case_sensitive'		=> 'Tag case-sensitive',
-    'tag_stemming'				=> 'Allow stemming words',
-	'tag_check_badword'			=> 'Use list of bad words',
-	'tag_cloud_spacer'			=> 'String to be used as spacer in Tag Cloud',
-	'max_tag_cloud'				=> 'Max number of tags in Tag Cloud',
-	'max_tag_cloud_in_block'	=> 'Max Number of tgas in Tag Cloud Block',
-	'tag_cloud_threshold'		=> 'Threshold of Tag Levels',
-	'replace_underscore'		=> 'Replace an underscore with a space',
-	'num_keywords'				=> 'Max number of keywords',
-	'publish_as_template_vars'	=> 'Publish tags as template vars',
-	'default_block_name_menu'	=> 'Default name for Tag Menu Block',
-	'menu_indenter'				=> 'String to be used as an indenter in Tag Menu',
-	'add_num_items_to_menu'		=> 'Display number of items in Tag Menu',
+	'hidetagmenu'					=> 'Hide Tag Menu entry',
+	'default_block_name'			=> 'Default name for Tag Cloud Block',
+	'tag_name'						=> 'Tag name',
+	'max_tag_len'					=> 'Max length of tag in bytes',
+	'tag_case_sensitive'			=> 'Tag case-sensitive',
+    'tag_stemming'					=> 'Allow stemming words',
+	'tag_check_badword'				=> 'Use list of bad words',
+	'tag_cloud_spacer'				=> 'String to be used as spacer in Tag Cloud',
+	'max_tag_cloud'					=> 'Max number of tags in Tag Cloud',
+	'max_tag_cloud_in_block'		=> 'Max Number of tgas in Tag Cloud Block',
+	'tag_cloud_threshold'			=> 'Threshold of Tag Levels',
+	'tag_cloud_threshold_max_count'	=> 'Threshold of percentage-based system',
+	'replace_underscore'			=> 'Replace an underscore with a space',
+	'num_keywords'					=> 'Max number of keywords',
+	'publish_as_template_vars'		=> 'Publish tags as template vars',
+	'default_block_name_menu'		=> 'Default name for Tag Menu Block',
+	'menu_indenter'					=> 'String to be used as an indenter in Tag Menu',
+	'add_num_items_to_menu'			=> 'Display number of items in Tag Menu',
 );
 
 $LANG_configsubgroups['tag'] = array(

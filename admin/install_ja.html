@@ -80,7 +80,7 @@
 		</tr>
 		<tr>
 			<th>バージョン</th>
-			<td>0.5.1</td>
+			<td>0.5.2</td>
 		</tr>
 		<tr>
 			<th>Geeklogのバージョン</th>
@@ -215,6 +215,11 @@
 			<td>タグクラウドの個々のタグのレベルを決めるタグの出現回数の上限値。タグクラウドのタグは10段階に分けられています(level 0からlevel 9まで)。タグの数がレベル X以下のタグはレベル Xに属します。個々のレベルはCSS（カスケイディングスタイルシート）のクラスと対応しているので、レベルに応じてタグのスタイルを変えることができます。</td>
 		</tr>
 		<tr>
+			<td><a name="desc_tag_cloud_threshold_max_count">パーセントシステムへ切り替える上限値</td>
+			<td>20</td>
+			<td>タグの数がこの設定値を超えると、タグレベルをタグの出現頻度に基づいたパーセンテージで計算します。タグの数がこの設定値以下の場合は従来通り、タグレベルに指定した数で計算します。パーセントシステムへ切り替えたくない場合は、大きな数値（999999など）を指定してください。Tomさんに感謝します。</td>
+		</tr>
+		<tr>
 			<td><a name="desc_replace_underscore">タグのアンダースコアをスペースに置換して表示</a>('replace_underscore')</td>
 			<td>いいえ</td>
 			<td>「はい」にすると、タグに含まれるアンダースコア('_')をスペースに置き換えて表示します。</td>
@@ -248,6 +253,14 @@
 			<th style="width: 6em;">バージョン</th>
 			<th style="width: 6em;">公開日</th>
 			<th>説明</th>
+		</tr>
+		<tr>
+			<td class="center">0.5.2</td>
+			<td class="center">2011-01-04</td>
+			<td>
+				<span class="fix">修正</span> 表示するアイテムがないときにエラーが発生していたバグを修正しました。Tomさんに感謝します。<br>
+				<span class="new">新規</span> パーセントシステムへ切り替えるコンフィギュレーションを追加しました。詳しくは<a href="#desc_tag_cloud_threshold_max_count">こちら</a>をご覧ください。Tomさんに感謝します。
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.5.1</td>
@@ -319,6 +332,6 @@
 		</tr>
 	</table>
 	
-	<p id="copyright">Copyright &copy; 2006-2010 mystral-kk</p>
+	<p id="copyright">Copyright &copy; 2006-2011 mystral-kk</p>
 </body>
 </html>

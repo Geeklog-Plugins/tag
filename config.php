@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/config.php                                            |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -48,7 +48,7 @@ $_TAG_CONF = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version']    = '0.5.1';					// Plugin Version
+$_TAG_CONF['pi_version']    = '0.5.2';					// Plugin Version
 $_TAG_CONF['pi_gl_version'] = '1.6.0';					// GL Version plugin for
 $_TAG_CONF['pi_url']        = 'http://mystral-kk.net/';	// Plugin Homepage
 

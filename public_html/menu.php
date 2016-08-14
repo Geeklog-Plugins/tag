@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/tag/menu.php                                                  |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -129,4 +129,4 @@ $T->set_var('tag_menu', $tag_menu);
 $T->parse('output', 'page');
 $display .= $T->finish($T->get_var('output'))
 		 .  COM_siteFooter();
-echo $display;
+COM_output($display);
