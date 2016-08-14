@@ -48,7 +48,7 @@ $_TAG_CONF = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version'] = '0.4.0';						// Plugin Version
+$_TAG_CONF['pi_version'] = '0.4.1';						// Plugin Version
 $_TAG_CONF['gl_version'] = '1.4.0';						// GL Version plugin for
 $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 
@@ -195,11 +195,13 @@ $_TAG_CONF['add_num_items_to_menu'] = false;
 if (version_compare(VERSION, '1.5') >= 0) {
     require_once $_CONF['path_system'] . 'classes/config.class.php';
     
-    $conf = config::get_instance();
-    if ($conf->group_exists('tag')) {
-        $temp = $conf->get_config('tag');
+    $tag_config = config::get_instance();
+    if ($tag_config->group_exists('tag')) {
+        $temp = $tag_config->get_config('tag');
         if (is_array($temp) AND (count($temp) >= 1)) {
             $_TAG_CONF = array_merge($_TAG_CONF, $temp);
         }
     }
+	
+	unset($tag_config);
 }

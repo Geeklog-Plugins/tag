@@ -192,6 +192,9 @@ function plugin_upgrade_tag() {
 			
 			break;
 			
+		case '0.4.1':
+			break;
+		
 		default:
 			break;
 	}
