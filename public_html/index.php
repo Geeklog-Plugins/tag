@@ -71,18 +71,18 @@ $T->set_var('tag_cloud', TAG_getTagCloud($_TAG_CONF['max_tag_cloud'], false));
 if ($tag != '') {
 	$tag = TAG_normalize($tag);
 	$tag_id = TAG_getTagId($tag);
-	
+
 	if ($tag_id !== FALSE) {
 		TAG_increaseHitCount($tag_id);
 		$text = $tag;
-		
+
 		if ($_TAG_CONF['replace_underscore'] === TRUE) {
 			$text = str_replace('_', ' ', $text);
 		}
-		
+
 		$T->set_var('selected_tag', sprintf($LANG_TAG['selected_tag'], TAG_escape($text)));
 	}
-	
+
 	$T->set_var('tagged_items', ($tag != '') ? TAG_getTaggedItems($tag) : '');
 }
 

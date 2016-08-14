@@ -49,7 +49,7 @@ if (!SEC_hasRights('tag.admin')) {
     COM_output($display);
     exit;
 }
- 
+
 /**
 * Main 
 */
@@ -58,23 +58,23 @@ class TagBadword
 	function TagBadword()
 	{
 	}
-	
+
 	function add()
 	{
 	}
-	
+
 	function edit()
 	{
 	}
-	
+
 	function delete()
 	{
 	}
-	
+
 	function view()
 	{
 		global $_CONF, $_TABLES;
-		
+
 		$body = '';
 		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
 		$T->set_file('badword', 'admin_badword.thtml');
@@ -87,17 +87,17 @@ class TagBadword
 		$T->set_var('lang_add', TAG_str('add'));
 		$T->set_var('lang_lbl_tag', TAG_str('lbl_tag'));
 		$T->set_var('lang_delete_checked', TAG_str('delete_checked'));
-		
+
 		$sql = "SELECT * FROM {$_TABLES['tag_badwords']}";
 		$result = DB_query($sql);
-		
+
 		if (DB_error()) {
 			return $retval . '<p>' . TAG_str('db_error') . '</p>';
 		} else if (DB_numRows($result) == 0) {
 			$T->set_var('msg', '<p>' . TAG_str('no_badword') . '</p>');
 		} else {
 			$sw = 1;
-			
+
 			while (($A = DB_fetchArray($result)) !== false) {
 				$word = TAG_escape($A['badword']);
 				$body .= '<tr><td>'
@@ -107,18 +107,18 @@ class TagBadword
 				$sw = ($sw == 1) ? 2 : 1;
 			}
 		}
-				
+
 		$T->set_var('body', $body);
 		$T->parse('output', 'badword');
 		$retval = $T->finish($T->get_var('output'));
-		
+
 		return $retval;
 	}
-	
+
 	function doAdd()
 	{
 		global $_TABLES;
-		
+
 		/**
 		* Adds a bad word into DB
 		*/
@@ -126,60 +126,60 @@ class TagBadword
 		$sql = "INSERT INTO {$_TABLES['tag_badwords']} (badword) "
 			 . "VALUES ('" . addslashes($word) . "')";
 		$result = DB_query($sql);
-		
+
 		// Deletes the bad word from list and map if it already exists
 		$tag_id = TAG_getTagId($word);
-		
+
 		if ($tag_id !== false) {
 			$sql = "DELETE FROM {$_TABLES['tag_list']} "
 				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
 			DB_query($sql);
-			
+
 			$sql = "DELETE FROM {$_TABLES['tag_map']} "
 				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
 			DB_query($sql);
 		}
-		
+
 		return DB_error() ? TAG_str('add_fail') : TAG_str('add_success');
 	}
-	
+
 	function doEdit()
 	{
 	}
-	
+
 	function doDelete()
 	{
 		global $_TABLES, $LANG_TAG;
-		
+
 		$submit = TAG_post('submit');
-		
+
 		if ($submit == $LANG_TAG['add']) {
 			$this->doAdd();
 			return;
 		}
-		
+
 		$words = TAG_post('words');
 		if (count($words) == 0) {
 			return '';
 		}
-		
+
 		/**
 		* Deletes a bad word from DB
 		*/
 		$words4db = array_map('addslashes', $words);
 		$words4db = "('" . implode("','", $words4db) . "')";
-		
+
 		$sql = "DELETE FROM {$_TABLES['tag_badwords']} "
 			 . "WHERE (badword IN " . $words4db . ")";
 		$result = DB_query($sql);
-		
+
 		/**
 		* Rescans articles and staticpages for tags
 		*/
 		DB_query("DELETE FROM {$_TABLES['tag_list']} ");
 		DB_query("DELETE FROM {$_TABLES['tag_map']} ");
 		TAG_scanAll();
-		
+
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
 	}
 }

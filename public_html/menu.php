@@ -77,21 +77,21 @@ if (!DB_error()) {
 		$url   = '';
 		$title = '';
 		$item  = '<li><a href="';
-		
+
 		switch ($A['type']) {
 			case 'article':
 				/* Fall through to default */
-			
+
 			default:
 				$url = COM_buildURL($_CONF['site_url'] . '/article.php?story=' . TAG_escape($A['sid']));
 				$title = TAG_getStoryTitle($A['sid']);
 				break;
 		}
-		
+
 		if ($url == '') {
 			continue;
 		}
-		
+
 		$item .= $url . '">' . TAG_escape($title) . '</a></li>' . LB;
 		$tag_menu[] = $item;
 	}
@@ -108,11 +108,11 @@ if (count($tag_menu) > 0) {
 $tags = array_map('TAG_getTagName', $tags);
 if ($_TAG_CONF['replace_underscore'] === true) {
 	$temp = array();
-	
+
 	foreach ($tags as $tag) {
 		$temp[] = str_replace('_', ' ', $tag);
 	}
-	
+
 	$tags = $temp;
 }
 

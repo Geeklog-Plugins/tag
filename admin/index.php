@@ -54,7 +54,7 @@ if (!SEC_hasRights('tag.admin')) {
     COM_output($display);
     exit;
 }
- 
+
 /**
 * Main 
 */
@@ -92,15 +92,15 @@ switch ($action) {
 	case 'doAdd':
 		$msg = $obj->doAdd();
 		break;
-	
+
 	case 'doEdit':
 		$msg = $obj->doEdit();
 		break;
-	
+
 	case 'doDelete':
 		$msg = $obj->doDelete();
 		break;
-	
+
 	default:
 		$msg = '';
 		break;
@@ -143,18 +143,18 @@ switch ($action) {
 	case 'add':
 		$content = $obj->add();
 		break;
-	
+
 	case 'edit':
 		$content = $obj->edit();
 		break;
-	
+
 	case 'delete':
 		$content = $obj->delete();
 		break;
-	
+
 	case 'view':
 		/* Fall through to default */
-	
+
 	default:
 		$content = $obj->view();
 		break;

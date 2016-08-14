@@ -40,11 +40,11 @@ require_once dirname(__FILE__) . '/config.php';
 */
 function plugin_autoinstall_tag($pi_name) {
 	global $_TAG_CONF;
-	
+
 	$pi_name         = 'tag';
 	$pi_display_name = 'Tag';
 	$pi_admin        = $pi_display_name . ' Admin';
-	
+
 	$info = array(
 		'pi_name'         => $pi_name,
 		'pi_display_name' => $pi_display_name,
@@ -52,13 +52,13 @@ function plugin_autoinstall_tag($pi_name) {
 		'pi_gl_version'   => $_TAG_CONF['pi_gl_version'],
 		'pi_homepage'     => $_TAG_CONF['pi_url'],
 	);
-	
+
 	$groups   = $_TAG_CONF['GROUPS'];
 	$features = $_TAG_CONF['FEATURES'];
 	$mappings = $_TAG_CONF['MAPPINGS'];
-	
+
 	$tables = array('tag_list', 'tag_map', 'tag_badwords', 'tag_menu');
-	
+
 	$inst_parms = array(
 		'info'      => $info,
 		'groups'    => $groups,
@@ -66,7 +66,7 @@ function plugin_autoinstall_tag($pi_name) {
 		'mappings'  => $mappings,
 		'tables'    => $tables
 	);
-	
+
 	return $inst_parms;
 }
 
@@ -81,12 +81,12 @@ function plugin_autoinstall_tag($pi_name) {
 function plugin_load_configuration_tag($pi_name)
 {
     global $_CONF;
-    
+
     $base_path = $_CONF['path'] . 'plugins/' . $pi_name . '/';
-    
+
     require_once $_CONF['path_system'] . 'classes/config.class.php';
     require_once $base_path . 'install_defaults.php';
-    
+
     return plugin_initconfig_tag();
 }
 
@@ -94,18 +94,18 @@ function plugin_load_configuration_tag($pi_name)
 * Checks if the plugin is compatible with this Geeklog version
 *
 * @param    string  $pi_name    Plugin name
-* @return   boolean             true: plugin compatible; false: not compatible
+* @return   boolean             TRUE: plugin compatible; FALSE: not compatible
 */
 function plugin_compatible_with_this_version_tag($pi_name) {
-	global $_CONF, $_DB_dbms, $_TAG_CONF;
-	
+	global $_CONF, $_DB_dbms, $_TABLES, $_TAG_CONF;
+
 	$retval = TRUE;
-	
-	// checks if we support the DBMS the site is running on
+
+	// Checks if we support the DBMS the site is running on
 	$dbFile = $_CONF['path'] . 'plugins/' . $pi_name . '/sql/' . $_DB_dbms
 			. '_install.php';
 	clearstatcache();
-	
+
 	if (!file_exists($dbFile)) {
 		$retval = FALSE;
 	} else if (defined('VERSION')) {
@@ -114,7 +114,15 @@ function plugin_compatible_with_this_version_tag($pi_name) {
 	} else {
 		$retval = FALSE;
 	}
-	
+
+	// Checks if the version of the staticpages plugin is 1.6.3 or greater
+	$version = DB_getItem($_TABLES['plugins'], 'pi_version', "pi_name = 'staticpages'");
+	$version = preg_replace('/[^0-9\.]/', '', $version);
+
+	if (version_compare($version, '1.6.3') < 0) {
+		$retval = FALSE;
+	}
+
 	return $retval;
 }
 
@@ -123,32 +131,32 @@ function plugin_compatible_with_this_version_tag($pi_name) {
 */
 function plugin_postinstall_tag($pi_name) {
 	global $_CONF, $_TABLES, $_USER, $_TAG_CONF, $LANG_TAG;
-	
+
 	require_once dirname(__FILE__) . '/functions.inc';
 
 	// Adds a tag cloud block to the site
 	$sql = "INSERT INTO {$_TABLES['blocks']} "
-		 . "(is_enabled, name, type, title, tid, blockorder, onleft, "
-		 . "phpblockfn, owner_id, group_id, perm_owner, perm_group, "
-		 . "perm_members, perm_anon) "
+		 . "  (is_enabled, name, type, title, tid, blockorder, onleft, "
+		 . "  phpblockfn, owner_id, group_id, perm_owner, perm_group, "
+		 . "  perm_members, perm_anon) "
 		 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name'])
 		 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
 		 . "', 'all', '1', '0', 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
 		 . "', '1', '3', '3', '2', '2')";
 	DB_query($sql);
-	
+
 	// Adds a tag menu block to the site
 	$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, "
-		 . "tid, blockorder, onleft, phpblockfn, owner_id, group_id, "
-		 . "perm_owner, perm_group, perm_members, perm_anon) "
+		 . "  tid, blockorder, onleft, phpblockfn, owner_id, group_id, "
+		 . "  perm_owner, perm_group, perm_members, perm_anon) "
 		 . "VALUES ('1', '" . addslashes($_TAG_CONF['default_block_name_menu'])
 		 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
 		 . "', 'all', '1', '1', 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
 		 . "', '1', '3', '3', '2', '2')";
 	DB_query($sql);
-	
+
 	// Scans all contents
 	TAG_scanAll();
-	
+
 	return TRUE;
 }

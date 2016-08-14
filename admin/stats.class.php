@@ -49,7 +49,7 @@ if (!SEC_hasRights('tag.admin')) {
     COM_output($display);
     exit;
 }
- 
+
 /**
 * Main 
 */
@@ -58,25 +58,25 @@ class TagStats
 	function TagStats()
 	{
 	}
-	
+
 	function add()
 	{
 	}
-	
+
 	function edit()
 	{
 	}
-	
+
 	function delete()
 	{
 	}
-	
+
 	function view()
 	{
 		global $_CONF, $_TABLES;
-		
+
 		$retval = '';
-		
+
 		$sql = "SELECT L.tag_id, L.tag, COUNT(m.tag_id) AS cnt, L.hits "
 			 . "FROM {$_TABLES['tag_list']} AS L "
 			 . "LEFT JOIN {$_TABLES['tag_map']} AS m "
@@ -84,13 +84,13 @@ class TagStats
 			 . "GROUP BY m.tag_id "
 			 . "ORDER BY cnt DESC, tag";
 		$result = DB_query($sql);
-		
+
 		if (DB_error()) {
 			return $retval . '<p>' . TAG_str('db_error') . '</p>';
 		} else if (DB_numRows($result) == 0) {
 			return $retval . '<p>' . TAG_str('no_tag') . '</p>';
 		}
-		
+
 		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
 		$T->set_file('stats', 'admin_stats.thtml');
 		$T->set_var('xhtml', XHTML);
@@ -104,10 +104,10 @@ class TagStats
 		$T->set_var('lang_lbl_hit_count', TAG_str('lbl_hit_count'));
 		$T->set_var('lang_delete_checked', TAG_str('delete_checked'));
 		$T->set_var('lang_ban_checked', TAG_str('ban_checked'));
-		
+
 		$sw = 1;
 		$body = '';
-		
+
 		while (($A = DB_fetchArray($result)) !== false) {
 			$tag_id = $A['tag_id'];
 			$body .= '<tr class="pluginRow' . $sw . '">'
@@ -120,60 +120,60 @@ class TagStats
 				  .  TAG_escape($A['hits']) .  '</td></tr>' . LB;
 			$sw = ($sw == 1) ? 2 : 1;
 		}
-		
+
 		$T->set_var('body', $body);
 		$T->parse('output', 'stats');
 		$retval = $T->finish($T->get_var('output'));
-		
+
 		return $retval;
 	}
-	
+
 	function doAdd()
 	{
 	}
-	
+
 	function doEdit()
 	{
 	}
-	
+
 	function doDelete()
 	{
 		global $_TABLES, $LANG_TAG;
-		
+
 		// Retrieves request vars
 		$tag_ids = TAG_post('tag_ids', true, true);
-		
+
 		if (count($tag_ids) == 0) {
 			return '';
 		}
-		
+
 		$cmd = TAG_post('submit');
 		if ($cmd != $LANG_TAG['delete_checked']
 		 AND $cmd != $LANG_TAG['ban_checked']) {
 			return '';
 		}
-		
+
 		$tag_ids = array_map('addslashes', $tag_ids);
 		$tag_ids = "'" . implode("','", $tag_ids) . "'";
-		
+
 		// Registers banned words into DB
-		
+
 		if ($cmd == $LANG_TAG['ban_checked']) {
 			$sql = "INSERT INTO {$_TABLES['tag_badwords']} "
 				 . "SELECT tag FROM {$_TABLES['tag_list']} "
 				 . "WHERE (tag_id IN ({$tag_ids}))";
 			$result = DB_query($sql);
 		}
-		
+
 		// Deletes tags from registered tag list
 		$sql = "DELETE FROM {$_TABLES['tag_list']} "
 			 . "WHERE (tag_id IN ({$tag_ids}))";
 		$result = DB_query($sql);
-		
+
 		$sql = "DELETE FROM {$_TABLES['tag_map']} "
 			 . "WHERE (tag_id IN ({$tag_ids}))";
 		$result = DB_query($sql);
-		
+
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
 	}
 }
