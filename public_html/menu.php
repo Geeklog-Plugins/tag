@@ -41,7 +41,7 @@ if (!defined('XHTML')) {
 
 // Retrieve request vars
 COM_setArgNames(array('tag'));
-$tag =COM_getArgument('tag');
+$tag  = COM_getArgument('tag');
 $tags = explode('_', COM_applyFilter($tag));
 if (count($tags) == 0) {
 	COM_refresh($_CONF['site_url'] . '/index.php');
@@ -83,7 +83,7 @@ if (!DB_error()) {
 				break;
 		}
 		
-		if ($title == '') {
+		if ($url == '') {
 			continue;
 		}
 		
@@ -99,12 +99,24 @@ if (count($tag_menu) > 0) {
 } else {
 	$tag_menu = TAG_str('no_item');
 }
+
+$tags = array_map('TAG_getTagName', $tags);
+if ($_TAG_CONF['replace_underscore'] === true) {
+	$temp = array();
+	
+	foreach ($tags as $tag) {
+		$temp[] = str_replace('_', ' ', $tag);
+	}
+	
+	$tags = $temp;
+}
+
 $T->set_var(
 	'title',
 	TAG_escape(
 		sprintf(
 			$LANG_TAG['menu_title'],
-			implode(', ', array_map('TAG_getTagName', $tags))
+			implode(', ', $tags)
 		)
 	)
 );

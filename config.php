@@ -50,7 +50,7 @@ $_TAG_CONF = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version'] = '0.3.1';						// Plugin Version
+$_TAG_CONF['pi_version'] = '0.3.2';						// Plugin Version
 $_TAG_CONF['gl_version'] = '1.4.0';						// GL Version plugin for
 $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 

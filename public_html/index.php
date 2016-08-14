@@ -65,7 +65,11 @@ if ($tag != '') {
 	$tag_id = TAG_getTagId($tag);
 	if ($tag_id !== false) {
 		TAG_increaseHitCount($tag_id);
-		$T->set_var('selected_tag', sprintf($LANG_TAG['selected_tag'], TAG_escape($tag)));
+		$text = $tag;
+		if ($_TAG_CONF['replace_underscore'] === true) {
+			$text = str_replace('_', ' ', $text);
+		}
+		$T->set_var('selected_tag', sprintf($LANG_TAG['selected_tag'], TAG_escape($text)));
 	}
 	
 	$T->set_var('tagged_items', ($tag != '') ? TAG_getTaggedItems($tag) : '');

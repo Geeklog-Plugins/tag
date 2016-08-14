@@ -362,6 +362,10 @@ if (!function_exists('COM_truncate')) {
 function plugin_getheadercode_tag() {
 	global $_CONF, $_USER, $_TAG_CONF;
 	
+	if (!defined('XHTML')) {
+		define('XHTML', '');
+	}
+	
 	$theme = isset($_USER['theme']) ? $_USER['theme'] : $_CONF['theme'];
 	clearstatcache();
 	if (file_exists($_CONF['path_themes'] . $theme . '/tag.css')) {
@@ -623,13 +627,15 @@ function plugin_autotags_tag($cmd, $content = '', $autotag = '') {
 					if ($_TAG_CONF['tag_stemming'] === true) {
 						$tag = TAG_stem($tag);
 					}
+					
+					$text = $tag;
 					if ($_TAG_CONF['replace_underscore'] === true) {
-						$tag = str_replace('_', ' ', $tag);
+						$text = str_replace('_', ' ', $text);
 					}
 					$url = $_CONF['site_url'] . '/tag/index.php?tag='
 						 . rawurlencode($tag);
 					$tag_part .= '<a class="tag_link" href="' . COM_buildURL($url)
-							  .  '">' .  TAG_escape($tag) . '</a> ';
+							  .  '">' .  TAG_escape($text) . '</a> ';
 				}
 			}
 			
@@ -836,6 +842,11 @@ function plugin_itemsaved_tag($id, $type) {
 	global $_TABLES;
 	
 	if ($type == 'article') {
+		// Delete old records from tag_map
+		$sql = "DELETE FROM {$_TABLES['tag_map']} "
+			 . "WHERE (type = 'article') AND (sid = '" . addslashes($id) . "')";
+		DB_query($sql);
+		
 		$sql = "SELECT introtext, bodytext FROM {$_TABLES['stories']} "
 			 . "WHERE (sid = '" . addslashes($id) . "')";
 		$result = DB_query($sql);
@@ -884,7 +895,7 @@ function TAG_getLevel($count) {
 * Get a tag cloud
 *
 * @param int     $limit: max number of clouds
-* @param boolean $is_block: true = for site block,
+* @param boolean $is_block: true  = for site block,
 *                           false = for public_html/tag/index.php
 */
 function TAG_getTagCloud($limit = 0, $is_block = false) {
@@ -924,7 +935,11 @@ function TAG_getTagCloud($limit = 0, $is_block = false) {
 	
 	foreach ($list as $tag => $data) {
 		$rel   = rawurlencode($tag);
-		$title = TAG_escape($tag);
+		$title = $tag;
+		if ($_TAG_CONF['replace_underscore'] === true) {
+			$title = str_replace('_', ' ', $title);
+		}
+		$title = TAG_escape($title);
 		$level = TAG_getLevel($data['cnt']);
 		$url   = COM_buildURL($_CONF['site_url'] . '/tag/index.php?tag=' . $rel);
 		$T->set_var('level', $level);
@@ -955,7 +970,11 @@ function TAG_formatRelatedTags($all_tags, $tag) {
 		if ($t != $tag) {
 			$url  = COM_buildURL($_CONF['site_url'] . '/tag/index.php?tag='
 				  . rawurlencode($t));
-			$text = TAG_escape($t);
+			$text = $t;
+			if ($_TAG_CONF['replace_underscore'] === true) {
+				$text = str_replace('_', ' ', $text);
+			}
+			$text = TAG_escape($text);
 			$retval .= '<a href="' . $url . '" rel="' . $text . '">' . $text . '</a>  ';
 		}
 	}
@@ -1265,16 +1284,22 @@ function TAG_buildTagMenu(&$nodes, &$node, $parent_tag_ids, $level) {
 	global $_CONF, $_TAG_CONF;
 	
 	$retval = '';
+	if (!defined('XHTML')) {
+		define('XHTML', '');
+	}
 	
 	$tag_ids = array_merge($parent_tag_ids, $node['tag_ids']);
 	$tag_ids = array_unique($tag_ids);
 	sort($tag_ids);
 	$tag_ids4url = implode('_', $tag_ids);
-	$url = $_CONF['site_url'] . '/tag/menu.php?tag=' . $tag_ids4url;
-	
+	$url  = $_CONF['site_url'] . '/tag/menu.php?tag=' . $tag_ids4url;
+	$text = $node['menu_name'];
+	if ($_TAG_CONF['replace_underscore'] === true) {
+		$text = str_replace('_', ' ', $text);
+	}
 	$retval .= str_repeat($_TAG_CONF['menu_indenter'], $level)
 			.  '<a class="bl_tag_menu_item" href="' . COM_buildURL($url) . '">'
-			. TAG_escape($node['menu_name']) . '</a>';
+			. TAG_escape($text) . '</a>';
 	
 	// Add the number of items
 	if ($_TAG_CONF['add_num_items_to_menu'] === true) {

@@ -71,7 +71,7 @@
 		</tr>
 		<tr>
 			<th>Version</th>
-			<td>0.3.1</td>
+			<td>0.3.2</td>
 		</tr>
 		<tr>
 			<th>Author</th>
@@ -197,7 +197,7 @@
 		<tr>
 			<td>$_TAG_CONF['replace_underscore']</td>
 			<td>false</td>
-			<td>Whether to replace an underscore included in tag texts with a space</td>
+			<td>Whether to replace an underscore included in tag texts with a space when a tag is displayed.</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['num_keywords']</td>
@@ -228,6 +228,15 @@
 			<th>Version</th>
 			<th>Date</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="center">0.3.2</td>
+			<td class="center">2008-02-28</td>
+			<td>
+				<span class="fix">Fixed</span> to better delete non-existent tags from database.<br>
+				<span class="fix">Fixed</span> to handle 'XHTML' constant properly when &lt;meta name="keywords" content="foo,bar"&gt; is published.<br>
+				<span class="fix">Fixed</span> to better handle underscores when $_TAG_CONF['replace_underscore'] is true.
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.3.1</td>

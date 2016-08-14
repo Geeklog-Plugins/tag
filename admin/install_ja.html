@@ -74,7 +74,7 @@
 		</tr>
 		<tr>
 			<th>バージョン</th>
-			<td>0.3.1</td>
+			<td>0.3.2</td>
 		</tr>
 		<tr>
 			<th>作者</th>
@@ -119,7 +119,7 @@
 	
 	<h2>使用法</h2>
 	
-	<p>記事を書いていてタグをつけたくなったら，<code>[tag:好きなタグ名]</code>を記事中に入力します。次のように複数のタグを指定することもできます。<code>[tag:Geeklog plugins]</code>タグとタグの間はスペースで区切ります。"Zend Framework"のような複数の単語で構成されるタグを登録するには，アンダースコア(_)を使って"Zend Framework"と入力してください。デフォルトの設定では，タグの大文字と小文字は区別されません。たとえば，"Geeklog"は，"geeklog"や"GEEKLOG"と同じとみなされます。</p>
+	<p>記事を書いていてタグをつけたくなったら，<code>[tag:好きなタグ名]</code>を記事中に入力します。次のように複数のタグを指定することもできます。<code>[tag:Geeklog plugins]</code>タグとタグの間はスペースで区切ります。Zend Framework のような複数の単語で構成されるタグを登録するには，アンダースコア(_)を使って Zend_Framework と入力してください。デフォルトの設定では，タグの大文字と小文字は区別されません。たとえば，Geeklog は，geeklog や GEEKLOG と同じとみなされます。</p>
 	
 	<ul>
 		<li>ある種のタグを禁止したい場合には，管理者メニューから禁止できます。やはり，大文字と小文字は区別されません。</li>
@@ -156,12 +156,12 @@
 		<tr>
 			<td>$_TAG_CONF['tag_case_sensitive']</td>
 			<td>false</td>
-			<td>trueにすると，たとえば，"Geeklog"というタグは"geeklog"というタグと違うものと見なされます。このオプションを変更した場合は，Tagプラグインをインストールし直してください。</td>
+			<td>trueにすると，たとえば，Geeklog というタグは geeklog というタグと違うものと見なされます。このオプションを変更した場合は，Tagプラグインをインストールし直してください。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_stemming']</td>
 			<td>false</td>
-			<td>trueにすると，アルファベットだけで構成されるタグは語幹だけに切り詰められます（英語のみ）。たとえば，"realize"というタグは"real"に切り詰められ，結果として"realize"というタグは"real"というタグと同じものと見なされます。<br><br><strong>警告</strong>: この機能はまだ完全ではありません。たとえば，'Firefox'というタグは切り詰められて，'Firefoxi'になります。したがって，このオプションをtrueに設定することは当分の間（おそらく，ずっと）お勧めしません。</td>
+			<td>trueにすると，アルファベットだけで構成されるタグは語幹だけに切り詰められます（英語のみ）。たとえば，realize というタグは real に切り詰められ，結果として realize というタグは real というタグと同じものと見なされます。<br><br><strong>警告</strong>: この機能はまだ完全ではありません。たとえば，Firefox というタグは切り詰められて，Firefoxi になります。したがって，このオプションをtrueに設定することは当分の間（おそらく，ずっと）お勧めしません。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_check_badword']</td>
@@ -211,7 +211,7 @@
 		<tr>
 			<td><a name="CONF_publish_as_template_vars">$_TAG_CONF['publish_as_template_vars']</a></td>
 			<td>false</td>
-			<td>falseにすると，タグは記事中に表示されず，テンプレート変数({tag_label}と{tag_part})として，'storytext.thtml', 'featuredstorytext.thtml', 'archivestorytext.thtml'の中で参照できるようになります。trueにすると，タグとして記事中に表示されます。<strong>この機能はGeeklog-1.4.1以降で有効です。</strong></td>
+			<td>trueにすると，タグは記事中に表示されず，テンプレート変数({tag_label}と{tag_part})として，'storytext.thtml', 'featuredstorytext.thtml', 'archivestorytext.thtml'の中で参照できるようになります。falseにすると，タグとして記事中に表示されます。<strong>この機能はGeeklog-1.4.1以降で有効です。</strong></td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['menu_indenter']</td>
@@ -232,6 +232,16 @@
 			<th>バージョン</th>
 			<th>公開日</th>
 			<th>説明</th>
+		</tr>
+		<tr>
+			<td class="center">0.3.2</td>
+			<td class="center">2008-02-28</td>
+			<td>
+				<span class="fix">修正</span> 不要なタグをデータベースから削除するように修正しました。<br>
+				<span class="fix">修正</span> $_TAG_CONF['publish_as_template_vars']の説明で，trueとfalseの説明が逆になっていたのを修正しました。<br>
+				<span class="fix">修正</span> &lt;meta name="keywords" content="foo,bar"&gt;タグを出力する際，'XHTML'がそのままヘッダに出力されていたバグを修正しました。<br>
+				<span class="fix">修正</span> $_TAG_CONF['replace_underscore']がtrueのときのアンダースコア('_')の扱いを改善しました。
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.3.1</td>
