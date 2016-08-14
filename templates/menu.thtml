@@ -1,0 +1,6 @@
+<div id="tag_menu_container">
+	<h2>{title}</h2>
+	<div id="tag_menu_body">
+		{tag_menu}
+	</div>
+</div>

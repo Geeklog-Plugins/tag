@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<title>Install/Uninstall instruction for the Geeklog tag plugin</title>
+	<style type="text/css">
+	<!-->
+		body {
+			color: black;
+			background-color: white;
+			line-height: 1.5em;
+		}
+		table {
+		 	border: solid 1px black;
+			border-collapse: collapse;
+		}
+		h2 {
+			margin-top: 50px;
+			border-left: solid 10px #0033cc;
+			padding-left: 5px;
+		}
+		code {
+			line-height: 1.5em;
+			display: block;
+			width: 80%;
+			border: dotted 1px black;
+			background-color: #ccffff;
+			padding: 5px;
+			margin: 10px;
+		}
+		th,
+		td
+		{
+		 	border: solid 1px black;
+			padding: 5px;
+		}
+		.geeklog {
+			background-color: yellow;
+		}
+		.public {
+			background-color: #99ff00;
+		}
+		.admin {
+			background-color: aqua;
+		}
+		.center {
+			text-align: center;
+		}
+	<! -->
+	</style>
+</head>
+
+<body>
+	<h1>Install/Uninstall instruction for the Geeklog tag plugin</h1>
+	
+	<table>
+		<tr>
+			<th>Plugin Name</th>
+			<td>Tag plugin</td>
+		</tr>
+		<tr>
+			<th>Version</th>
+			<td>0.1.0</td>
+		</tr>
+		<tr>
+			<th>Author</th>
+			<td>mystral-kk - geeklog AT mystral-kk DOT net</td>
+		</tr>
+		<tr>
+			<th>License</th>
+			<td>GPL</td>
+		</tr>
+	</table>
+	
+	<h2>ABSTRACT</h2>
+	
+	<p>Tag plugin enables you to put "tags" to your articles and make it easier for you and visitors to classify articles using the tags.</p>
+	
+	<h2>INSTALL</h2>
+
+	<p>In the following descriptions</p>
+	<ul>
+		<li><span class="geeklog">&lt;geeklog_dir&gt;</span> is the directory where the system config.php file resides</li>
+		<li><span class="public">&lt;public_html&gt;</span> is the directory where the lib-common.php file resides</li>
+		<li><span class="admin">&lt;admin&gt;</span> is the directory where the administration files reside (usually, under <span class="public">&lt;public_html&gt;</span>)</li>
+	</ul>
+
+	<ol>
+		<li>Back up your Geeklog Database.  The tag plugin adds tables to your Geeklog database.  You can do this with the built in admin backup facility.</li>
+		<li>Uncompress the tag plugin archive while in the <span class="geeklog">&lt;geeklog_dir&gt;</span>/plugins directory.  The archive will create a directory called tag in the plugins directory.</li>
+		<li>Create the public_html and admin directories.  Under your html directory (usually <span class="public">&lt;public_html&gt;</span>) create a directory called tag.  Under your <span class="admin">&lt;admin&gt;</span>/plugins/ directory create a directory called tag.</li>
+		<li>Change to your <span class="geeklog">&lt;geeklog_dir&gt;</span>/plugins/tag/ directory.  Copy the files in the admin directory to the <span class="admin">&lt;admin&gt;</span>/plugins/tag/ directory your created in step 3.  Copy the files and directories in the public_html directory to the <span class="public">&lt;public_html&gt;</span>/tag/ directory your created in step 3.</li>
+		<li>Edit the config.php in the tag directory and confirm the table prefix and anonymous access settings and other display settings.  The default is to use the geeklog table prefix and not allow anonymous access.</li>
+		<li>Log in to your Geeklog as a root user and run install.php in your <span class="admin">&lt;admin&gt;</span>/plugins/tag/ directory.  The install page will tell you if the install was successful or not.  If not, examine Geeklog system errorlog for possible problems.  The tag plugin should now be installed and functioning.  Clicking on the tag Icon will take you to the admin page.</li>
+		<li>Set up security.  On install only the root users have access to tag administration and Viewing.  You can delegate control for either of these functions through the user and group editors.</li>
+	</ol>
+
+	<h2>UNINSTALL</h2>
+
+	<ol>
+		<li>Run the install.php page in your <span class="admin">&lt;admin&gt;</span>/plugins/tag directory.  This will remove all the data from your database.</li>
+		<li>Delete the three plugin directories created in the install process:  <span class="geeklog">&lt;geeklog-dir&gt;</span>/plugins/tag/, <span class="public">&lt;public_html&gt;</span>/tag/ and <span class="admin">&lt;admin&gt;</span>/plugins/tag/</li>
+	</ol>
+	
+	<h2>USAGE</h2>
+	
+	<p>When you are writing an article and want to put tags to it, just enter <code>[tag:your_favorite_tag]</code>in the article.  You can use multiple tags like this:<code>[tag:Geeklog plugins]</code>Each tag must be separated by a space.  By default, tags are case-insensitive.  For example, the tag "Geeklog" will be identified with "geeklog" or "GEEKLOG".</p>
+	
+	<ul>
+		<li>If you want to ban certain tags, you can do so in the admin control panel.  Bad words are also case-insensitive.</li>
+		<li>If you would like to display "tag clouds" in your site block, just create a PHP block with the function name being <strong>phpblock_tag_cloud</strong>.</li>
+		<li>The apperance of tag clouds are controlled with templates (in <span class="geeklog">&lt;geeklog&gt;</span>/plugins/tag/templates/) and Cascading Style Sheet (as <span class="public">&lt;public_html&gt;</span>/tag/tag.css).  In case <span class="public">&lt;public_html&gt;</span>/layout/your_theme/tag.css exists, this will be preferred over <span class="public">&lt;public_html&gt;</span>/tag/tag.css.</li>
+	</ul>
+	
+	<h2>Configurations by modifying &lt;geeklog&gt;/plugins/tag/config.php</h2>
+	
+	<p>You can change some behavior of tag plugin by modifying the above file.  Available options are:</p>
+	<table>
+		<caption>[Options]</caption>
+		<tr>
+			<th>Var name</th>
+			<th>Default Value</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_name']</td>
+			<td>tag</td>
+			<td>Tag name to be used in items (articles), like '[tag:foo]'.  You might prefer a shorter name like '[t:foo]'.</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['max_tag_len']</td>
+			<td>60</td>
+			<td>Max length of a tag in bytes.  Should not be longer than 255.</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_case_sensitive']</td>
+			<td>false</td>
+			<td>If this is true, the tag "Geeklog" will NOT be identified with the tag "geeklog".</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_stemming']</td>
+			<td>false</td>
+			<td>If this is true, each tag consisting only of alphabets will be stemmed.  For example, tag "realize" will be stemmed into "real", thus tag "realize" will be identidied with tag "real".<br><br><strong>@WARNING: The stemming feature is still not perfect.  For example, 'Firefox' is stemmed into 'Firefoxi'.  So, I don't recommend you set $_TAG_CONF['tag_stemming'] to true for the time being (and forever, maybe).</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_check_badword']</td>
+			<td>true</td>
+			<td>Whether to use a list of bad words.  If a tag is regarded as bad, it will be  replaced with $LANG_TAG['badword_replace'] automatically.</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_cloud_spacer']</td>
+			<td>&nbsp;&nbsp;(2 spaces)</td>
+			<td>A string to be used as a spacer in displaying tag clouds</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['max_tag_cloud']</td>
+			<td>30</td>
+			<td>Max number of tags to be displayed in tag clouds in public_html/tag/index.php</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['max_tag_cloud_in_block']</td>
+			<td>20</td>
+			<td>Max number of tags to be displayed in tag clouds in side block</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>]</td>
+			<td>
+				$_TAG_CONF['tag_cloud_threshold'][0] = 1<br>
+				$_TAG_CONF['tag_cloud_threshold'][1] = 2<br>
+				$_TAG_CONF['tag_cloud_threshold'][2] = 3<br>
+				$_TAG_CONF['tag_cloud_threshold'][3] = 4<br>
+				$_TAG_CONF['tag_cloud_threshold'][4] = 5<br>
+				$_TAG_CONF['tag_cloud_threshold'][5] = 6<br>
+				$_TAG_CONF['tag_cloud_threshold'][6] = 7<br>
+				$_TAG_CONF['tag_cloud_threshold'][7] = 8<br>
+				$_TAG_CONF['tag_cloud_threshold'][8] = 9<br>
+			</td>
+			<td>Thresholds of frequency of each tag cloud level.  All tag clouds are classified in 10 levels (level 0..level 9).  Those tags whose number is equal to or smaller than $_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>] belong to level <strong>X</strong>.  Each level corresponds to its own class in CSS(Cascading Style Sheet), so you can display in different styles tags according to their levels.</td>
+		</tr>
+	</table>
+	
+	<h2>REVISION HISTORY</h2>
+	
+	<table>
+		<tr>
+			<th>Version</th>
+			<th>Date</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="center">0.1.0</td>
+			<td class="center">2008-01-12</td>
+			<td>Initial version</td>
+		</tr>
+	</table>
+	
+</body>
+</html>

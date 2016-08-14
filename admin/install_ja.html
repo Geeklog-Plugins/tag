@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<title>Geeklog tag プラグインのインストール/アンインストール</title>
+	<style type="text/css">
+	<!-->
+		body {
+			color: black;
+			background-color: white;
+			line-height: 1.5em;
+		}
+		table {
+		 	border: solid 1px black;
+			border-collapse: collapse;
+		}
+		h2 {
+			margin-top: 50px;
+			border-left: solid 10px #0033cc;
+			padding-left: 5px;
+		}
+		code {
+			line-height: 1.5em;
+			display: block;
+			width: 80%;
+			border: dotted 1px black;
+			background-color: #ccffff;
+			padding: 5px;
+			margin: 10px;
+		}
+		th,
+		td
+		{
+		 	border: solid 1px black;
+			padding: 5px;
+		}
+		.geeklog {
+			background-color: yellow;
+		}
+		.public {
+			background-color: #99ff00;
+		}
+		.admin {
+			background-color: aqua;
+		}
+		li {
+			padding: 5px 5px 10px 5px;
+		}
+	<! -->
+	</style>
+</head>
+
+<body>
+	<h1>Geeklog tag プラグインのインストール/アンインストール</h1>
+
+	<table>
+		<tr>
+			<th>プラグイン名</th>
+			<td>Tagプラグイン</td>
+		</tr>
+		<tr>
+			<th>バージョン</th>
+			<td>0.1.0</td>
+		</tr>
+		<tr>
+			<th>作者</th>
+			<td>mystral-kk - geeklog AT mystral-kk DOT net</td>
+		</tr>
+		<tr>
+			<th>ライセンス</th>
+			<td>GPL</td>
+		</tr>
+	</table>
+	
+	<h2>概要</h2>
+	
+	<p>Tagプラグインを使用すると，記事にタグをつけて簡単に分類できるようになります。</p>
+	
+	<h2>インストール</h2>
+	
+	<p>以下の説明で，</p>
+	<ul>
+		<li><span class="geeklog">&lt;geeklog_dir&gt;</span>は，システムの config.php が存在するディレクトリ</li>
+		<li><span class="public">&lt;public_html&gt;</span>は，lib-common.php が存在するディレクトリ</li>
+		<li><span class="admin">&lt;admin&gt;</span>は，管理者用ファイルが存在するディレクトリ（ふつうは，<span class="public">&lt;public_html&gt;</span>ディレクトリの下）</li>
+	</ul>
+	<p>を表しています。</p>
+
+	<ol>
+		<li>tag プラグインはテーブルを追加するので，管理者メニューの「DBのバックアップ」やphpMyAdminを使用して，事前にGeeklogのデータベースをバックアップしておきます。</li>
+		<li>tagプラグインのアーカイブを<span class="geeklog">&lt;geeklog_dir&gt;</span>/pluginsディレクトリに展開します。tagという名前のディレクトリができます。</li>
+		<li>public_htmlディレクトリとadminディレクトリを作ります。htmlファイルを納めるディレクトリ（普通は <span class="public">&lt;public_html&gt;</span>）の下に，tagという名前のディレクトリを作ります。<span class="admin">&lt;admin&gt;</span>/plugins/ ディレクトリの下にも tagという名前のディレクトリを作ります。</li>
+		<li><span class="geeklog">&lt;geeklog_dir&gt;</span>/plugins/tag/ ディレクトリに移動します。adminディレクトリの内容を，3.で作成した <span class="admin">&lt;admin&gt;</span>/plugins/tag/ ディレクトリにコピーします。public_htmlディレクトリの内容を，3.で作成した <span class="public">&lt;public_html&gt;</span>/tag/ ディレクトリにコピーします。</li>
+		<li>tagディレクトリの config.php ファイルを編集し，データベースのテーブルのプレフィックスとゲストユーザーのアクセス権，表示設定などを確認します。デフォルトでは，Geeklogのテーブルのプレフィックスを使用し，ゲストユーザーのアクセスを認めないようになっています。</li>
+		<li>Rootユーザーとしてログインし，プラグインエディタからインストールを実行します。失敗した場合には，エラーログ（error.log）を調べます。この時点で，tag プラグインはインストールされ，機能しているはずです。tag アイコンをクリックすると，管理機能ページへジャンプするでしょう。</li>
+		<li>セキュリティを設定します。インストール直後には，tagプラグインの管理権限を持っているのは，Rootユーザーだけです。ユーザーエディタやグループエディタを使用して，管理権限を他の人やグループに委譲することができます</li>
+	</ol>
+
+	<h2>アンインストール</h2>
+
+	<ol>
+		<li>プラグインエディタから，tag プラグインをアンインストールします。このとき，tagプラグインが使用していたテーブルは破棄され，その中に記録されていたデータも削除されます。</li>
+		<li>インストールの過程で作成した3つのディレクトリ（<span class="geeklog">&lt;geeklog-dir&gt;</span>/plugins/tag/ <span class="public">&lt;public_html&gt;</span>/tag/ and <span class="admin">&lt;admin&gt;</span>/plugins/tag/ を削除します。</li>
+	</ol>
+
+	<h2>使用法</h2>
+	
+	<p>記事を書いていてタグをつけたくなったら，<code>[tag:好きなタグ名]</code>を記事中に入力します。次のように複数のタグを指定することもできます。<code>[tag:Geeklog plugins]</code>タグとタグの間はスペースで区切ります。デフォルトの設定では，タグの大文字と小文字は区別されません。たとえば，"Geeklog"は，"geeklog"や"GEEKLOG"と同じとみなされます。</p>
+	
+	<ul>
+		<li>ある種のタグを禁止したい場合には，管理者メニューから禁止できます。やはり，大文字と小文字は区別されません。</li>
+		<li>サイトのブロックに「タグクラウド」を表示する場合は，PHPブロックを作成し，関数名に<strong>phpblock_tag_cloud</strong>を入力します。</li>
+		<li>タグクラウドの外観は，<span class="geeklog">&lt;geeklog&gt;</span>/plugins/tag/templates/にあるテンプレートとCSS(<span class="public">&lt;public_html&gt;</span>/tag/tag.css)で変更できます。なお，<span class="public">&lt;public_html&gt;</span>/layout/your_theme/tag.cssが存在する場合は，そちらの方が優先されます。</li>
+	</ul>
+	
+	<h2>&lt;geeklog&gt;/plugins/tag/config.phpの編集による設定</h2>
+	
+	<p>上記ファイルを編集することで，tagプラグインの動作を変更することができます。利用可能なオプションは次の通りです。</p>
+	<table>
+		<caption>[オプション]</caption>
+		<tr>
+			<th>変数名</th>
+			<th>デフォルト（既定）値</th>
+			<th>説明</th>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_name']</td>
+			<td>tag</td>
+			<td>[tag:foo]のように記事の中で使用するタグの名前。もっと短い[t:foo]のようにしてもよいでしょう。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['max_tag_len']</td>
+			<td>60</td>
+			<td>タグの長さの最大値（単位：バイト）。255を越えてはいけません。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_case_sensitive']</td>
+			<td>false</td>
+			<td>trueにすると，たとえば，"Geeklog"というタグは"geeklog"というタグと違うものと見なされます。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_stemming']</td>
+			<td>false</td>
+			<td>trueにすると，アルファベットだけで構成されるタグは語幹だけに切り詰められます（英語のみ）。たとえば，"realize"というタグは"real"に切り詰められ，結果として"realize"というタグは"real"というタグと同じものと見なされます。<br><br><strong>@警告: この機能はまだ完全ではありません。たとえば，'Firefox'というタグは切り詰められて，'Firefoxi'になります。したがって，このオプションをtrueに設定することは当分の間（おそらく，ずっと）お勧めしません。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_check_badword']</td>
+			<td>true</td>
+			<td>trueにすると，禁止語リストを使用し，あるタグが禁止語に当たるとみなされた場合，$LANG_TAG['badword_replace']に自動的に置き換えられます。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_cloud_spacer']</td>
+			<td>&nbsp;&nbsp;（半角スペース2個分）</td>
+			<td>タグクラウドを表示するときに使うタグとタグの間の区切りの文字列。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['max_tag_cloud']</td>
+			<td>30</td>
+			<td>public_html/tag/index.phpで表示されるタグクラウドの最大数。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['max_tag_cloud_in_block']</td>
+			<td>20</td>
+			<td>サイドブロックで表示されるタグクラウドの最大数。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>]</td>
+			<td>
+				$_TAG_CONF['tag_cloud_threshold'][0] = 1<br>
+				$_TAG_CONF['tag_cloud_threshold'][1] = 2<br>
+				$_TAG_CONF['tag_cloud_threshold'][2] = 3<br>
+				$_TAG_CONF['tag_cloud_threshold'][3] = 4<br>
+				$_TAG_CONF['tag_cloud_threshold'][4] = 5<br>
+				$_TAG_CONF['tag_cloud_threshold'][5] = 6<br>
+				$_TAG_CONF['tag_cloud_threshold'][6] = 7<br>
+				$_TAG_CONF['tag_cloud_threshold'][7] = 8<br>
+				$_TAG_CONF['tag_cloud_threshold'][8] = 9<br>
+			</td>
+			<td>タグクラウドの個々のタグのレベルを決めるタグの出現回数の上限値。タグクラウドのタグは10段階に分けられています(level 0からlevel 9まで)。タグの数が$_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>]以下のタグはレベル<strong>X</strong>に属します。個々のレベルはCSS（カスケイディングスタイルシート）のクラスと対応しているので，レベルに応じてタグのスタイルを変えることができます。</td>
+		</tr>
+	</table>
+	
+	<h2>改訂履歴</h2>
+	
+	<table>
+		<tr>
+			<th>バージョン</th>
+			<th>公開日</th>
+			<th>説明</th>
+		</tr>
+		<tr>
+			<td class="center">0.1.0</td>
+			<td class="center">2008-01-12</td>
+			<td>初期バージョン</td>
+		</tr>
+	</table>
+	
+
+</body>
+</html>

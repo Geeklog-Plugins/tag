@@ -1,0 +1,267 @@
+@charset "utf-8";
+
+/***********************************************************
+*
+*  Style Sheet for Geeklog Tag plugin
+*
+*  @tip      All classes and IDs starting with
+*            'b_' are used only in site blocks.
+*
+*  @caution  public_html/layout/your_theme/tag.css will
+*            be preferred to this file, if it exists.
+*
+************************************************************
+*/
+
+/**
+* Link text of tags in articles
+*/
+a.tag_link,
+a.tag_link:visited
+{
+	color: blue;
+	text-decoration: none;
+}
+
+a.tag_link:hover
+{
+	color: white;
+	background-color: blue;
+}
+
+/**
+* Tag container displayed in public_html/tag/index.php
+*/
+div#tag_container
+{
+	color: black;
+	background-color: white;
+	text-decoration: none;
+}
+
+div#tag_cloud_container,
+div#b_tag_cloud_container
+{
+	padding: 5px;
+	border-left: solid 1px #3366cc;
+	border-top: solid 1px #3366cc;
+	border-right: solid 2px #333399;
+	border-bottom: solid 2px #333399;
+	line-height: 2em;
+	margin-bottom: 5px;
+}
+
+div#tagged_items_container
+{
+	padding: 5px;
+}
+
+li.tagged_item
+{
+	margin-bottom: 5px;
+}
+
+div#tagged_item a,
+div#tagged_item a:visited
+{
+	color: black;
+	text-decoration: none;
+}
+
+div.related_tags a,
+div.related_tags a:visited
+{
+	font-size: 0.9em;
+	background-color: white;
+	color: black;
+	text-decoration: none;
+	border-bottom: solid 1px #999999;
+}
+
+div.related_tags a:hover
+{
+	color: white;
+	background-color: blue;
+}
+
+/**
+* Set styles of tag clouds separately
+*
+* @note If you would like to define styles of tag clouds differently
+*       in public_html/tag/ and site block, define
+*
+*       div#tag_cloud_container a.tag_lvx {
+*       }
+*
+*       div#b_tag_cloud_container a.tag_lvx {
+*       }
+*
+*       instead of defining
+*
+*       div#tag_cloud_container a.tag_lvx,
+*       div#b_tag_cloud_container a.tag_lv0
+*       {
+*       }
+*
+*/
+a.tag_lv0,
+a.tag_lv0:visited
+{
+	color: black;
+	font-size: 0.9em;
+	text-decoration: none;
+}
+
+a.tag_lv0:hover
+{
+	color: white;
+	background-color: black;
+}
+
+a.tag_lv1,
+a.tag_lv1:visited
+{
+	color: black;
+	font-size: 1em;
+	text-decoration: none;
+}
+
+a.tag_lv1:hover
+{
+	color: white;
+	background-color: black;
+}
+
+
+a.tag_lv2,
+a.tag_lv2:visited
+{
+	color: blue;
+	font-size: 1.2em;
+	text-decoration: none;
+}
+
+a.tag_lv2:hover
+{
+	color: white;
+	background-color: blue;
+}
+
+a.tag_lv3,
+a.tag_lv3:visited
+{
+	color: blue;
+	font-size: 1.4em;
+	text-decoration: none;
+}
+
+a.tag_lv3:hover
+{
+	color: white;
+	background-color: blue;
+}
+
+a.tag_lv4,
+a.tag_lv4:visited
+{
+	color: #009933;
+	font-size: 1.6em;
+	text-decoration: none;
+}
+
+a.tag_lv4:hover
+{
+	color: white;
+	background-color: #009933;
+}
+
+a.tag_lv5,
+a.tag_lv5:visited
+{
+	color: #009933;
+	font-size: 1.8em;
+	text-decoration: none;
+}
+
+a.tag_lv5:hover
+{
+	color: white;
+	background-color: #009933;
+}
+
+a.tag_lv6,
+a.tag_lv6:visited
+{
+	color: #cc3300;
+	font-size: 2em;
+	text-decoration: none;
+}
+
+a.tag_lv6:hover
+{
+	color: white;
+	background-color: #cc3300;
+}
+
+a.tag_lv7,
+a.tag_lv7:visited
+{
+	color: #cc3300;
+	font-size: 2.2em;
+	text-decoration: none;
+}
+
+a.tag_lv7:hover
+{
+	color: white;
+	background-color: #cc3300;
+}
+
+a.tag_lv8,
+a.tag_lv8:visited
+{
+	color: red;
+	font-size: 2.4em;
+	text-decoration: none;
+}
+
+a.tag_lv8:hover
+{
+	color: white;
+	background-color: red;
+}
+
+a.tag_lv9,
+a.tag_lv9:visited
+{
+	color: red;
+	font-size: 2.6em;
+	text-decoration: none;
+}
+
+a.tag_lv9:hover
+{
+	color: white;
+	background-color: red;
+}
+
+/**
+* For displaying tag menu
+*/
+
+div#tag_menu
+{
+}
+
+div#tag_menu_container
+{
+}
+
+div#tag_menu_body
+{
+	line-height: 1.5em;
+}
+
+div#tag_menu_body li a
+{
+}

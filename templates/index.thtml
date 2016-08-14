@@ -1,0 +1,11 @@
+<div id="tag_container">
+	<h2>{lang_tag_list}</h2>
+	{tag_cloud}
+	<div id="tagged_items_container">
+		<p>{selected_tag}</p>
+		<ol>
+			{tagged_items}
+		</ol>
+	</div>
+</div>
+<br{xhtml}>

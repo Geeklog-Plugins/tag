@@ -1,0 +1,5 @@
+<h2>{header}</h2>
+{navbar}
+<p>{msg}</p>
+{content}
+<br{xhtml}>

@@ -1,0 +1,23 @@
+<p>{lang_desc_delete_menu}</p>
+
+<form method="post" action="{this_script}">
+	<table class="plugin">
+		<tr>
+			<th>{lang_menu_name}</th>
+			<td>{menu_name}</td>
+		</tr>
+		<tr>
+			<th>{lang_menu_parent}</th>
+			<td>{menu_parent}</td>
+		</tr>
+		<tr>
+			<th>{lang_menu_tags}</th>
+			<td>{menu_tags}</td>
+		</tr>
+	</table>
+	<input name="cmd" type="hidden" value="menuconfig">
+	<input name="action" type="hidden" value="doDelete">
+	<input name="menu_id" type="hidden" value="{menu_id}">
+	<input name="submit" type="submit" value="{lang_submit}">&nbsp;
+	<input name="submit" type="submit" value="{lang_cancel}">
+</form>

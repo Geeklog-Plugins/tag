@@ -1,0 +1,23 @@
+<p>{lang_desc}</p>
+
+<form method="post" action="{this_script}">
+	<table class="plugin">
+		<tr>
+			<th>{lang_menu_name}</th>
+			<td><input name="menu_name" type="text" size="50" value="{menu_name}"></td>
+		</tr>
+		<tr>
+			<th>{lang_menu_parent}</th>
+			<td>{menu_parent}</td>
+		</tr>
+		<tr>
+			<th>{lang_menu_tags}</th>
+			<td><input name="menu_tags" type="text" size="100" value="{menu_tags}"></td>
+		</tr>
+	</table>
+	<input name="cmd" type="hidden" value="menuconfig">
+	<input name="action" type="hidden" value="{action}">
+	<input name="menu_id" type="hidden" value="{menu_id}">
+	<input name="submit" type="submit" value="{lang_submit}">
+	{delete_button}
+</form>
