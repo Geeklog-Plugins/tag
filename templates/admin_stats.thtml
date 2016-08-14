@@ -9,9 +9,10 @@
 		</tr>
 		{body}
 	</table>
-	<br{xhtml}>
-	<input name="cmd" type="hidden" value="menuconfig">
-	<input name="action" type="hidden" value="doDelete">
-	<input name="submit" type="submit" value="{lang_delete_checked}">
-	<input name="submit" type="submit" value="{lang_ban_checked}">
+	<div style="margin-top: 1em;">
+		<input name="cmd" type="hidden" value="stats"{xhtml}>
+		<input name="action" type="hidden" value="doDelete"{xhtml}>
+		<input name="submit" type="submit" value="{lang_delete_checked}"{xhtml}>
+		<input name="submit" type="submit" value="{lang_ban_checked}"{xhtml}>
+	</div>
 </form>

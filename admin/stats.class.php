@@ -143,12 +143,13 @@ class TagStats
 		// Retrieves request vars
 		$tag_ids = TAG_post('tag_ids', true, true);
 
-		if (count($tag_ids) == 0) {
+		if (!is_array($tag_ids) OR (count($tag_ids) === 0)) {
 			return '';
 		}
 
 		$cmd = TAG_post('submit');
-		if ($cmd != $LANG_TAG['delete_checked']
+		
+		if ($cmd != $LANG_TAG['delete_checked'] 
 		 AND $cmd != $LANG_TAG['ban_checked']) {
 			return '';
 		}

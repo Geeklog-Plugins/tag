@@ -15,9 +15,11 @@
 			<td><input name="menu_tags" type="text" size="100" value="{menu_tags}"{xhtml}></td>
 		</tr>
 	</table>
-	<input name="cmd" type="hidden" value="menuconfig"{xhtml}>
-	<input name="action" type="hidden" value="{action}"{xhtml}>
-	<input name="menu_id" type="hidden" value="{menu_id}"{xhtml}>
-	<input name="submit" type="submit" value="{lang_submit}"{xhtml}>
-	{delete_button}
+	<div style="margin-top: 1em;">
+		<input name="cmd" type="hidden" value="menuconfig"{xhtml}>
+		<input name="action" type="hidden" value="{action}"{xhtml}>
+		<input name="menu_id" type="hidden" value="{menu_id}"{xhtml}>
+		<input name="submit" type="submit" value="{lang_submit}"{xhtml}>
+		{delete_button}
+	</div>
 </form>

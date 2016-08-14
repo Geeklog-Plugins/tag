@@ -2,19 +2,19 @@
 {msg}
 
 <form method="post" action="{this_script}">
-	<input name="cmd" type="hidden" value="badword"{xhtml}>
-	<input name="action" type="hidden" value="doDelete"{xhtml}>
-	<input name="word" type="text"{xhtml}>
-	<input name="submit" type="submit" value="{lang_add}">
-	<br{xhtml}>
-	
+	<div style="margin-bottom: 1em;">
+		<input name="cmd" type="hidden" value="badword"{xhtml}>
+		<input name="action" type="hidden" value="doDelete"{xhtml}>
+		<input name="word" type="text"{xhtml}>
+		<input name="submit" type="submit" value="{lang_add}"{xhtml}>
+	</div>
 	<table class="plugin">
 		<tr>
 			<th>{lang_lbl_tag}</th>
 		</tr>
 		{body}
 	</table>
-	<br{xhtml}>
-	
-	<input name="submit" type="submit" value="{lang_delete_checked}"{xhtml}>
+	<div style="margin-top: 1em;">
+		<input name="submit" type="submit" value="{lang_delete_checked}"{xhtml}>
+	</div>
 </form>

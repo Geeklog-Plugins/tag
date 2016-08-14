@@ -123,6 +123,13 @@ class TagBadword
 		* Adds a bad word into DB
 		*/
 		$word = TAG_post('word');
+		$word = trim($word);
+		
+		if (empty($word)
+		 OR (DB_count($_TABLES['tag_badwords'], 'badword', addslashes($word)) > 0)) {
+			return TAG_str('add_fail');
+		}
+
 		$sql = "INSERT INTO {$_TABLES['tag_badwords']} (badword) "
 			 . "VALUES ('" . addslashes($word) . "')";
 		$result = DB_query($sql);
@@ -159,7 +166,8 @@ class TagBadword
 		}
 
 		$words = TAG_post('words');
-		if (count($words) == 0) {
+
+		if (!is_array($words) OR (count($words) === 0)) {
 			return '';
 		}
 

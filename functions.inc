@@ -191,6 +191,7 @@ function plugin_upgrade_tag() {
 			/* Fall through into the next case */
 
 		case '0.5.2':
+		case '0.5.3':
 		default:
 			break;
 	}
