@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/index.php                                   |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -39,7 +39,7 @@ if (!defined('XHTML')) {
 }
 
 /**
-* Only let admin users access this page
+* Only lets admin users access this page
 */
 if (!SEC_hasRights('tag.admin')) {
     /**
@@ -51,7 +51,7 @@ if (!SEC_hasRights('tag.admin')) {
 			 . $LANG_TAG['access_denied_msg']
 			 . COM_endBlock()
 			 . COM_siteFooter(true);
-    echo $display;
+    COM_output($display);
     exit;
 }
  
@@ -63,26 +63,26 @@ $commands = array('stats', 'badword', 'menuconfig');
 $actions  = array('view', 'add', 'edit', 'delete', 'doAdd', 'doEdit', 'doDelete');
 
 /**
-* Retrieve request vars
+* Retrieves request vars
 */
 $cmd = TAG_get('cmd');
-if ($cmd === false) {
+if ($cmd === FALSE) {
 	$cmd = TAG_post('cmd');
 }
-if (($cmd === false) OR !in_array($cmd, $commands)) {
+if (($cmd === FALSE) OR !in_array($cmd, $commands)) {
 	$cmd = 'stats';
 }
 
 $action = TAG_get('action');
-if ($action === false) {
+if ($action === FALSE) {
 	$action = TAG_post('action', true);
 }
-if (($action === false) OR !in_array($action, $actions)) {
+if (($action === FALSE) OR !in_array($action, $actions)) {
 	$action = 'view';
 }
 
 /**
-* Process command
+* Processes command
 */
 require_once $cmd . '.class.php';
 $class = 'Tag' . ucfirst($cmd);
@@ -114,6 +114,9 @@ $T = new Template($_CONF['path'] . 'plugins/tag/templates');
 $T->set_file('admin', 'admin.thtml');
 $T->set_var('xhtml', XHTML);
 $T->set_var('header', TAG_str('admin'));
+$T->set_var('config_url', $_CONF['site_admin_url'] . '/configuration.php');
+$T->set_var('lang_config', TAG_str('config'));
+
 if ($msg != '') {
 	$T->set_var('msg', '<p>' . $msg . '</p>');
 }
@@ -161,5 +164,4 @@ $T->set_var('content', $content);
 $T->parse('output', 'admin');
 $display .= $T->finish($T->get_var('output'))
 		 .  COM_siteFooter();
-
-echo $display;
+COM_output($display);

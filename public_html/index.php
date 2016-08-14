@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/tag/index.php                                                 |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -71,12 +71,15 @@ $T->set_var('tag_cloud', TAG_getTagCloud($_TAG_CONF['max_tag_cloud'], false));
 if ($tag != '') {
 	$tag = TAG_normalize($tag);
 	$tag_id = TAG_getTagId($tag);
-	if ($tag_id !== false) {
+	
+	if ($tag_id !== FALSE) {
 		TAG_increaseHitCount($tag_id);
 		$text = $tag;
-		if ($_TAG_CONF['replace_underscore'] === true) {
+		
+		if ($_TAG_CONF['replace_underscore'] === TRUE) {
 			$text = str_replace('_', ' ', $text);
 		}
+		
 		$T->set_var('selected_tag', sprintf($LANG_TAG['selected_tag'], TAG_escape($text)));
 	}
 	
@@ -86,4 +89,4 @@ if ($tag != '') {
 $T->parse('output', 'page');
 $display .= $T->finish($T->get_var('output'))
 		 .  COM_siteFooter();
-echo $display;
+COM_output($display);

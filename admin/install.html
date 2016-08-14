@@ -77,7 +77,11 @@
 		</tr>
 		<tr>
 			<th>Version</th>
-			<td>0.4.1</td>
+			<td>0.5.0</td>
+		</tr>
+		<tr>
+			<th>Required Geeklog Version</th>
+			<td>1.6.0 or later</td>
 		</tr>
 		<tr>
 			<th>Author</th>
@@ -121,7 +125,7 @@
 	
 	<h2>USAGE</h2>
 	
-	<p>When you are writing an article and want to put tags to it, just enter <code>[tag:your_favorite_tag]</code>in the article.  You can use multiple tags like this:<code>[tag:Geeklog plugins]</code>Each tag must be separated by a space.  If you would like to register words as one tag, such as "Zend Framework", you should enter "Zend_Framework".  By default, tags are case-insensitive.  For example, the tag "Geeklog" will be identified with "geeklog" or "GEEKLOG".</p>
+	<p>When you are writing an article or a staticpage, and want to put tags to it, just enter <code>[tag:your_favorite_tag]</code>in the item.  You can use multiple tags like this:<code>[tag:Geeklog plugins]</code>Each tag must be separated by a space.  If you would like to register words as one tag, such as "Zend Framework", you should enter "Zend_Framework".  By default, tags are case-insensitive.  For example, the tag "Geeklog" will be identified with "geeklog" or "GEEKLOG".</p>
 	
 	<ul>
 		<li>If you want to ban certain tags, you can do so in the admin control panel.  Bad words are also case-insensitive.</li>
@@ -130,100 +134,106 @@
 		<li>(Version-0.3.0 or later)  If you would like to display a menu based on tags in your site block, just create a PHP block with the function name being <strong>phpblock_tag_menu</strong>.  You can edit menu items in the admin control panel.<br><strong>NOTE</strong>: Since version 0.3.0, a tag menu block will be created automatically during installation.</li>
 	</ul>
 	
-	<h2>Configurations by modifying &lt;geeklog&gt;/plugins/tag/config.php</h2>
+	<h2>Configurations</h2>
 	
-	<p>You can change some behavior of tag plugin by modifying the above file.  Available options are:</p>
+	<p>You can change some behavior of tag plugin by the Configuration menu after you have logged in as the site admin.  Available options are:</p>
 	<table>
-		<caption>[Options]</caption>
+		<caption>[Configuration Options]</caption>
 		<tr>
-			<th>Var name</th>
+			<th>Item(Var name)</th>
 			<th>Default Value</th>
 			<th>Description</th>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['default_block_name']</td>
+			<td><a name="desc_hidetagmenu">Hide Tag Menu entry</a>('hidetagmenu')</td>
+			<td>false</td>
+			<td>Setting this option to true hides the Tag entry from the top menu.</td>
+		</tr>
+		<tr>
+			<td><a name="desc_default_block_name">Default name for Tag Cloud Block</a>('default_block_name')</td>
 			<td>'tag_cloud_block'</td>
 			<td>The default name of tag block which will be created during the installation.  If you use Geeklog-1.4.1 or later and disable/enable the tag plugin, the block named $_TAG_CONF['default_block_name'] will also be disabled/enabled automatically.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['tag_name']</td>
+			<td><a name="desc_tag_name">Tag name</a>('tag_name')</td>
 			<td>tag</td>
 			<td>Tag name to be used in items (articles), like '[tag:foo]'.  You might prefer a shorter name like '[t:foo]'.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['max_tag_len']</td>
+			<td><a name="desc_max_tag_len">Max length of tag in bytes</a>('max_tag_len')</td>
 			<td>60</td>
 			<td>Max length of a tag in bytes.  Should not be longer than 255.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['tag_case_sensitive']</td>
+			<td><a name="desc_tag_case_sensitive">Tag case-sensitive</a>('tag_case_sensitive')</td>
 			<td>false</td>
 			<td>If this is true, the tag "Geeklog" will NOT be identified with the tag "geeklog".  When you change this option, you should re-install tag plugin.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['tag_stemming']</td>
+			<td><a name="desc_tag_stemming">Allow stemming words</a>('tag_stemming')</td>
 			<td>false</td>
-			<td>If this is true, each tag consisting only of alphabets will be stemmed.  For example, tag "realize" will be stemmed into "real", thus tag "realize" will be identidied with tag "real".<br><br><strong>@WARNING</strong>: The stemming feature is still not perfect.  For example, 'Firefox' is stemmed into 'Firefoxi'.  So, I don't recommend you set $_TAG_CONF['tag_stemming'] to true for the time being (and forever, maybe).</td>
+			<td>If this is true, each tag consisting only of alphabets will be stemmed.  For example, tag "realize" will be stemmed into "real", thus tag "realize" will be identidied with tag "real".<br><br><strong>@WARNING</strong>: The stemming feature is still experimental.  For example, 'Firefox' is stemmed into 'Firefoxi'.  So, I don't recommend you set $_TAG_CONF['tag_stemming'] to true for the time being (and forever, maybe).</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['tag_check_badword']</td>
+			<td><a name="desc_tag_check_badword">Use list of bad words</a>('tag_check_badword')</td>
 			<td>true</td>
-			<td>Whether to use a list of bad words.  If a tag is regarded as bad, it will be  replaced with $LANG_TAG['badword_replace'] automatically.</td>
+			<td>Whether to use a list of bad words.  If a tag is regarded as bad, it will be automatically replaced with $LANG_TAG['badword_replace'] defined in the language file.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['tag_cloud_spacer']</td>
+			<td><a name="desc_tag_cloud_spacer">String to be used as spacer in Tag Cloud</a>('tag_cloud_spacer')</td>
 			<td>&nbsp;&nbsp;(2 spaces)</td>
 			<td>A string to be used as a spacer in displaying tag clouds</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['max_tag_cloud']</td>
+			<td><a name="desc_max_tag_cloud">Max number of tags in Tag Cloud</a>('max_tag_cloud')</td>
 			<td>30</td>
 			<td>Max number of tags to be displayed in tag clouds in public_html/tag/index.php</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['max_tag_cloud_in_block']</td>
+			<td><a name="desc_max_tag_cloud_in_block">Max Number of tgas in Tag Cloud Block</a>('max_tag_cloud_in_block')</td>
 			<td>20</td>
 			<td>Max number of tags to be displayed in tag clouds in side block</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>]</td>
+			<td><a name="desc_tag_cloud_threshold">Threshold of Tag Levels</a>('tag_cloud_threshold')</td>
 			<td>
-				$_TAG_CONF['tag_cloud_threshold'][0] = 1<br>
-				$_TAG_CONF['tag_cloud_threshold'][1] = 2<br>
-				$_TAG_CONF['tag_cloud_threshold'][2] = 3<br>
-				$_TAG_CONF['tag_cloud_threshold'][3] = 4<br>
-				$_TAG_CONF['tag_cloud_threshold'][4] = 5<br>
-				$_TAG_CONF['tag_cloud_threshold'][5] = 6<br>
-				$_TAG_CONF['tag_cloud_threshold'][6] = 7<br>
-				$_TAG_CONF['tag_cloud_threshold'][7] = 8<br>
-				$_TAG_CONF['tag_cloud_threshold'][8] = 9<br>
+				Level 0 = 1<br>
+				Level 1 = 2<br>
+				Level 2 = 3<br>
+				Level 3 = 4<br>
+				Level 4 = 5<br>
+				Level 5 = 6<br>
+				Level 6 = 7<br>
+				Level 7 = 8<br>
+				Level 8 = 9<br>
+				Level 9 = 10<br>
 			</td>
-			<td>Thresholds of frequency of each tag cloud level.  All tag clouds are classified in 10 levels (level 0..level 9).  Those tags whose number is equal to or smaller than $_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>] belong to level <strong>X</strong>.  Each level corresponds to its own class in CSS(Cascading Style Sheet), so you can display in different styles tags according to their levels.</td>
+			<td>Thresholds of frequency of each tag cloud level.  All tag clouds are classified in 10 levels (Level 0..Level 9).  Those tags whose number is equal to or smaller than the level are considered to belong to the level.  Each level corresponds to its own class in CSS(Cascading Style Sheet), so you can display in different styles tags according to their levels.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['replace_underscore']</td>
+			<td><a name="desc_replace_underscore">Replace an underscore with a space</a>('replace_underscore')</td>
 			<td>false</td>
 			<td>Whether to replace an underscore included in tag texts with a space when a tag is displayed.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['num_keywords']</td>
+			<td><a name="desc_num_keywords">Max number of keywords</a>('num_keywords')</td>
 			<td>0</td>
 			<td>The number of key words to be included in &lt;meta name="keywords" content="foo,bar"&gt; tag.  If the number is 0, the meta tag won't be included.</td>
 		</tr>
 		<tr>
-			<td><a name="CONF_publish_as_template_vars">$_TAG_CONF['publish_as_template_vars']</a></td>
+			<td><a name="desc_publish_as_template_vars">Publish tags as template vars</a>('publish_as_template_vars')</td>
 			<td>false</td>
-			<td>If this is set to true, tags will NOT be displayed where they should be in the artcile, but will be published as template vars ({tag_label} and {tag_part}) which can be used in 'storytext.thtml', 'featuredstorytext.thtml', and 'archivestorytext.thtml'.  If this is set to false, tags will be displayed in the article.  <strong>This feature is valid for Geeklog-1.4.1 or later.</strong></td>
+			<td>If this is set to true, tags will NOT be displayed where they should be in the artcile, but will be published as template vars ({tag_label} and {tag_part}) which can be used in 'storytext.thtml', 'featuredstorytext.thtml', and 'archivestorytext.thtml'.  If this is set to false, tags will be displayed in the article.</td>
 		</tr>
 		<tr>
-			<td>$_TAG_CONF['menu_indenter']</td>
-			<td>&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
-			<td>A string to indent an item of tag menu</td>
-		</tr>
-		<tr>
-			<td>$_TAG_CONF['add_num_items_to_menu']</td>
+			<td><a name="desc_add_num_items_to_menu">Display number of items in Tag Menu</a>('add_num_items_to_menu')</td>
 			<td>false</td>
 			<td>Whether to add the number of items to each tag menu item.<br><strong>@note This feature could be a costly operation.</strong></td>
+		</tr>
+		<tr>
+			<td><a name="desc_menu_indenter">String to be used as an indenter in Tag Menu</a>('menu_indenter')</td>
+			<td>&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+			<td>A string to indent an item of tag menu</td>
 		</tr>
 	</table>
 	
@@ -234,6 +244,15 @@
 			<th>Version</th>
 			<th>Date</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="center">0.5.0</td>
+			<td class="center">2010-12-27</td>
+			<td>
+				<span class="new">New</span> Now the Tag plugin supports Staticpages.<br>
+				<span class="new">New</span> Added an option to hide Tag entry from the main menu.<br>
+				<span class="fix">Fix</span> Modified to work properly when the id of an article was changed.
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.4.1</td>
@@ -288,6 +307,6 @@
 		</tr>
 	</table>
 	
-	<p id="copyright">Copyright &copy; 2006-2008 mystral-kk</p>
+	<p id="copyright">Copyright &copy; 2006-2010 mystral-kk</p>
 </body>
 </html>

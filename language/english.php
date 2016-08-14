@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------|
 // | geeklog/plugins/tag/language/english.php                                  |
 // +---------------------------------------------------------------------------|
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -30,10 +30,8 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------|
 
-$LANG_CHARSET = 'iso-8859-1';
-
 $LANG_TAG = array(
-    'plugin'            => 'tag Plugin',
+    'plugin'            => 'Tag Plugin',
 	'access_denied'     => 'Access Denied',
 	'access_denied_msg' => 'Only Root Users have Access to this Page.  Your user name and IP have been recorded.',
 	'admin'		        => 'tag Plugin Admin',
@@ -80,6 +78,7 @@ $LANG_TAG = array(
 	'menu_parent'       => 'Parent Menu',
 	'menu_tags'         => 'Contained Tags',
 	'menu_dsp_order'    => 'Display Order',
+	'no_menu'			=> 'No menu defined',
 	'desc_add_menu'     => 'Add Tag Menu',
 	'desc_edit_menu'    => 'Edit Tag Menu',
 	'desc_delete_menu'  => 'Delete Tag Menu',
@@ -94,6 +93,7 @@ $LANG_TAG = array(
 	'edit_fail'         => 'Cannot modify.',
 	'menu_title'        => 'Items containing tags: %s',
 	'no_item'           => 'No matching items found.',
+	'config'			=> 'Configuration',
 );
 
 
@@ -107,23 +107,23 @@ $LANG_configsections['tag'] = array(
 * For Config UI
 */
 $LANG_confignames['tag'] = array(
-	'default_block_name'       => 'Default name for Tag Cloud Block',
-	'tag_name'                 => 'Tag name',
-	'max_tag_len'              => 'Max length of tag in bytes',
-	'tag_case_sensitive'       => 'Tag case-sensitive',
-    'tag_stemming'             => 'Allow stemming words',
-	'tag_check_badword'        => 'Use list of bad words',
-	'tag_cloud_spacer'         => 'String to be used as spacer in Tag Cloud',
-	'max_tag_cloud'            => 'Max number of tags in Tag Cloud',
-	'max_tag_cloud_in_block'   => 'Max Number of tgas in Tag Cloud Block',
-	'tag_cloud_threshold'      => 'Threshold of Tag Levels',
-	'replace_underscore'       => 'Replace an underscore with a space',
-	'num_keywords'             => 'Max number of keywords',
-	'publish_as_template_vars' => 'Publish tags as template vars',
-	'default_block_name_menu'  => 'Default name for Tag Menu Block',
-	'menu_indenter'            => 'String to be used as an indenter in Tag Menu',
-	'add_num_items_to_menu'    => 'Display number of items in Tag Menu',
-	
+	'hidetagmenu'				=> 'Hide Tag Menu entry',
+	'default_block_name'		=> 'Default name for Tag Cloud Block',
+	'tag_name'					=> 'Tag name',
+	'max_tag_len'				=> 'Max length of tag in bytes',
+	'tag_case_sensitive'		=> 'Tag case-sensitive',
+    'tag_stemming'				=> 'Allow stemming words',
+	'tag_check_badword'			=> 'Use list of bad words',
+	'tag_cloud_spacer'			=> 'String to be used as spacer in Tag Cloud',
+	'max_tag_cloud'				=> 'Max number of tags in Tag Cloud',
+	'max_tag_cloud_in_block'	=> 'Max Number of tgas in Tag Cloud Block',
+	'tag_cloud_threshold'		=> 'Threshold of Tag Levels',
+	'replace_underscore'		=> 'Replace an underscore with a space',
+	'num_keywords'				=> 'Max number of keywords',
+	'publish_as_template_vars'	=> 'Publish tags as template vars',
+	'default_block_name_menu'	=> 'Default name for Tag Menu Block',
+	'menu_indenter'				=> 'String to be used as an indenter in Tag Menu',
+	'add_num_items_to_menu'		=> 'Display number of items in Tag Menu',
 );
 
 $LANG_configsubgroups['tag'] = array(
@@ -136,5 +136,5 @@ $LANG_fs['tag'] = array(
 
 // Note: entries 0, 1, 9, and 12 are the same as in $LANG_configselects['Core']
 $LANG_configselects['tag'] = array(
-    0 => array('Yes' => true, 'No' => false),
+    0 => array('Yes' => TRUE, 'No' => FALSE),
 );

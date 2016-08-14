@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------|
 // | geeklog/plugins/tag/language/japanese_utf-8.php                           |
 // +---------------------------------------------------------------------------|
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -29,8 +29,6 @@
 // | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA|
 // |                                                                           |
 // +---------------------------------------------------------------------------|
-
-$LANG_CHARSET = 'utf-8';
 
 $LANG_TAG = array (
     'plugin'            => 'タグプラグイン',
@@ -80,6 +78,7 @@ $LANG_TAG = array (
 	'menu_parent'       => '親メニュー',
 	'menu_tags'         => '含まれるタグ',
 	'menu_dsp_order'    => '表示順',
+	'no_menu'			=> '定義されているメニューはありません',
 	'desc_add_menu'     => 'タグメニュー追加',
 	'desc_edit_menu'    => 'タグメニュー編集',
 	'desc_delete_menu'  => 'タグメニュー削除',
@@ -94,6 +93,7 @@ $LANG_TAG = array (
 	'edit_fail'         => '変更できませんでした。',
 	'menu_title'        => '「%s」タグを含むアイテム',
 	'no_item'           => '該当するアイテムはありません。',
+	'config'			=> 'コンフィギュレーション',
 );
 
 // Localization of the Admin Configuration UI
@@ -106,22 +106,23 @@ $LANG_configsections['tag'] = array(
 * For Config UI
 */
 $LANG_confignames['tag'] = array(
-	'default_block_name'       => 'タグクラウドブロック名の初期値',
-	'tag_name'                 => 'タグの識別子',
-	'max_tag_len'              => 'タグの長さの最大値（単位：バイト）',
-	'tag_case_sensitive'       => 'タグの大文字小文字を区別する',
-    'tag_stemming'             => 'タグの語尾正規化を行う',
-	'tag_check_badword'        => 'バッドワードリストを使用する',
-	'tag_cloud_spacer'         => 'タグクラウドのスペーサ',
-	'max_tag_cloud'            => 'タグクラウドに表示されるタグの最大数',
-	'max_tag_cloud_in_block'   => 'タグクラウドブロックに表示されるタグの最大数',
-	'tag_cloud_threshold'      => 'タグレベルの上限値',
-	'replace_underscore'       => 'タグのアンダースコアをスペースに置換して表示',
-	'num_keywords'             => 'keywordsタグに表示するキーワード数の上限',
-	'publish_as_template_vars' => 'タグをテンプレート変数として出力',
-	'default_block_name_menu'  => 'タグメニューブロック名の初期値',
-	'menu_indenter'            => 'タグメニューをインデントする文字列',
-	'add_num_items_to_menu'    => 'タグメニューでアイテム数を表示',
+	'hidetagmenu'				=> 'メニューに表示しない',
+	'default_block_name'		=> 'タグクラウドブロック名の初期値',
+	'tag_name'					=> 'タグの識別子',
+	'max_tag_len'				=> 'タグの長さの最大値（単位：バイト）',
+	'tag_case_sensitive'		=> 'タグの大文字小文字を区別する',
+    'tag_stemming'				=> 'タグの語尾正規化を行う',
+	'tag_check_badword'			=> 'バッドワードリストを使用する',
+	'tag_cloud_spacer'			=> 'タグクラウドのスペーサ',
+	'max_tag_cloud'				=> 'タグクラウドに表示されるタグの最大数',
+	'max_tag_cloud_in_block'	=> 'タグクラウドブロックに表示されるタグの最大数',
+	'tag_cloud_threshold'		=> 'タグレベルの上限値',
+	'replace_underscore'		=> 'タグのアンダースコアをスペースに置換して表示',
+	'num_keywords'				=> 'keywordsタグに表示するキーワード数の上限',
+	'publish_as_template_vars'	=> 'タグをテンプレート変数として出力',
+	'default_block_name_menu'	=> 'タグメニューブロック名の初期値',
+	'menu_indenter'				=> 'タグメニューをインデントする文字列',
+	'add_num_items_to_menu'		=> 'タグメニューでアイテム数を表示',
 	
 );
 
@@ -135,5 +136,5 @@ $LANG_fs['tag'] = array(
 
 // Note: entries 0, 1, 9, and 12 are the same as in $LANG_configselects['Core']
 $LANG_configselects['tag'] = array(
-    0 => array('はい' => true, 'いいえ' => false),
+    0 => array('はい' => TRUE, 'いいえ' => FALSE),
 );

@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/badword.class.php                           |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -46,7 +46,7 @@ if (!SEC_hasRights('tag.admin')) {
 			 . TAG_str('access_denied_msg')
 			 . COM_endBlock()
 			 . COM_siteFooter();
-    echo $display;
+    COM_output($display);
     exit;
 }
  
@@ -90,6 +90,7 @@ class TagBadword
 		
 		$sql = "SELECT * FROM {$_TABLES['tag_badwords']}";
 		$result = DB_query($sql);
+		
 		if (DB_error()) {
 			return $retval . '<p>' . TAG_str('db_error') . '</p>';
 		} else if (DB_numRows($result) == 0) {
@@ -119,15 +120,16 @@ class TagBadword
 		global $_TABLES;
 		
 		/**
-		* Add a bad word into DB
+		* Adds a bad word into DB
 		*/
 		$word = TAG_post('word');
 		$sql = "INSERT INTO {$_TABLES['tag_badwords']} (badword) "
 			 . "VALUES ('" . addslashes($word) . "')";
 		$result = DB_query($sql);
 		
-		// Delete the bad word from list and map if it already exists
+		// Deletes the bad word from list and map if it already exists
 		$tag_id = TAG_getTagId($word);
+		
 		if ($tag_id !== false) {
 			$sql = "DELETE FROM {$_TABLES['tag_list']} "
 				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
@@ -150,6 +152,7 @@ class TagBadword
 		global $_TABLES, $LANG_TAG;
 		
 		$submit = TAG_post('submit');
+		
 		if ($submit == $LANG_TAG['add']) {
 			$this->doAdd();
 			return;
@@ -161,7 +164,7 @@ class TagBadword
 		}
 		
 		/**
-		* Delete a bad word from DB
+		* Deletes a bad word from DB
 		*/
 		$words4db = array_map('addslashes', $words);
 		$words4db = "('" . implode("','", $words4db) . "')";
@@ -171,11 +174,11 @@ class TagBadword
 		$result = DB_query($sql);
 		
 		/**
-		* Rescan articles for the unbanned bad word
+		* Rescans articles and staticpages for tags
 		*/
-		foreach ($words as $tag) {
-			TAG_rescanTag($tag);
-		}
+		DB_query("DELETE FROM {$_TABLES['tag_list']} ");
+		DB_query("DELETE FROM {$_TABLES['tag_map']} ");
+		TAG_scanAll();
 		
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
 	}

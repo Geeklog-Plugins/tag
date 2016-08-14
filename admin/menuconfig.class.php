@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/menuconfig.class.php                        |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008 mystral-kk - geeklog AT mystral-kk DOT net             |
+// | Copyright (C) 2008-2010 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -34,7 +34,7 @@
 require_once '../../../lib-common.php';
 
 /**
-* Only let admin users access this page
+* Only lets admin users access this page
 */
 if (!SEC_hasRights('tag.admin')) {
     /**
@@ -46,7 +46,7 @@ if (!SEC_hasRights('tag.admin')) {
 			 . TAG_str('access_denied_msg')
 			 . COM_endBlock()
 			 . COM_siteFooter();
-    echo $display;
+    COM_output($display);
     exit;
 }
  
@@ -72,15 +72,16 @@ class TagMenuconfig
 		$this->menuList[0] = TAG_str('no_parent');
 		$sql = "SELECT menu_id, menu_name FROM {$_TABLES['tag_menu']}";
 		$result = DB_query($sql);
+		
 		if (!DB_error()) {
-			while (($A = DB_fetchArray($result)) !== false) {
+			while (($A = DB_fetchArray($result)) !== FALSE) {
 				$this->menuList[$A['menu_id']] = $A['menu_name'];
 			}
 		}
 	}
 	
 	/**
-	* Set tag list
+	* Sets a tag list
 	*/
 	function _setTagList() {
 		global $_TABLES;
@@ -89,15 +90,16 @@ class TagMenuconfig
 		
 		$sql = "SELECT * FROM {$_TABLES['tag_list']}";
 		$result = DB_query($sql);
-		if (!DB_error() AND DB_numRows($result) >0) {
-			while (($A = DB_fetchArray($result)) !== false) {
+		
+		if (!DB_error() AND (DB_numRows($result) > 0)) {
+			while (($A = DB_fetchArray($result)) !== FALSE) {
 				$this->tagList[$A['tag_id']] = $A['tag'];
 			}
 		}
 	}
 	
 	/**
-	* Return option list of parent menus
+	* Returns option list of parent menus
 	*/
 	function getParentList($child_id, $current_parent_id)
 	{
@@ -107,9 +109,11 @@ class TagMenuconfig
 			foreach ($this->menuList as $id => $name) {
 				if ($child_id == 0 OR $id != $child_id) {
 					$retval .= '<option value="' . TAG_escape($id) . '"';
+					
 					if ($id == $current_parent_id) {
 						$retval .= ' selected="selected"';
 					}
+					
 					$retval .= '>' .  TAG_escape($name) . '</option>' . LB;
 				}
 			}
@@ -121,29 +125,31 @@ class TagMenuconfig
 	}
 	
 	/**
-	* Return all tags a menu has
+	* Returns all tags a menu has
 	*/
 	function _getTags($menu_id)
 	{
 		global $_TABLES;
 		
 		$retval = '';
-		
 		$sql = "SELECT tag_ids FROM {$_TABLES['tag_menu']} "
 			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 		$result = DB_query($sql);
-		if (!DB_error() AND DB_numRows($result) == 1) {
+		
+		if (!DB_error() AND (DB_numRows($result) == 1)) {
 			$A = DB_fetchArray($result);
 			$tag_ids = $A['tag_ids'];
+			
 			if ($tag_ids != '') {
 				$sql = "SELECT tag FROM {$_TABLES['tag_list']} "
 					 . "WHERE (tag_id IN (" . $tag_ids . "))";
 				$result = DB_query($sql);
+				
 				if (!DB_error()) {
-					while (($A = DB_fetchArray($result)) !== false) {
+					while (($A = DB_fetchArray($result)) !== FALSE) {
 						$retval .= $A['tag'] . ' ';
 					}
-				
+					
 					$retval = rtrim($retval);
 				}
 			}
@@ -153,7 +159,7 @@ class TagMenuconfig
 	}
 	
 	/**
-	* Convert tag list into tag id list
+	* Converts tag list into tag id list
 	*/
 	function _getIdList($menu_tags) {
 		$retval = array();
@@ -161,7 +167,8 @@ class TagMenuconfig
 		if (is_array($menu_tags) AND (count($menu_tags) > 0)) {
 			foreach ($menu_tags as $menu_tag) {
 				$tag_id = array_search($menu_tag, $this->tagList);
-				if ($tag_id !== false) {
+				
+				if ($tag_id !== FALSE) {
 					$retval[] = $tag_id;
 				}
 			}
@@ -212,13 +219,14 @@ class TagMenuconfig
 		$T->set_var('menu_id', TAG_escape($id));
 		$T->set_var('lang_submit', TAG_str('submit'));
 		$T->parse('output', 'addEdit');
+		
 		return $T->finish($T->get_var('output'));
-	
 	}
 	
 	function add()
 	{
-		$parent_id = TAG_get('pid', true);
+		$parent_id = TAG_get('pid', TRUE);
+		
 		return $this->_addEdit(0, $parent_id);
 	}
 	
@@ -226,8 +234,9 @@ class TagMenuconfig
 	{
 		global $_TABLES;
 		
-		$id  = TAG_get('id', true);
-		$pid = TAG_get('pid', true, true);
+		$id  = TAG_get('id', TRUE);
+		$pid = TAG_get('pid', TRUE, TRUE);
+		
 		return $this->_addEdit($id, $pid);
 	}
 	
@@ -239,6 +248,7 @@ class TagMenuconfig
 		$sql = "SELECT * FROM {$_TABLES['tag_menu']} "
 			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 		$result = DB_query($sql);
+		
 		if (DB_numRows($result) == 0) {
 			return TAG_str('db_error');
 		}
@@ -262,6 +272,7 @@ class TagMenuconfig
 		$T->set_var('menu_tags', TAG_escape($this->_getTags($menu_id)));
 		$T->set_var('menu_id', TAG_escape($menu_id));
 		$T->parse('output', 'delete');
+		
 		return $T->finish($T->get_var('output'));
 	}
 	
@@ -325,8 +336,8 @@ class TagMenuconfig
 		$T->set_var('lang_menu_dsp_order', TAG_str('menu_dsp_order'));
 		$T->set_var('lang_action', TAG_str('action'));
 		
-		
 		$menus = TAG_getMenuList();
+		
 		if (count($menus) == 0) {
 			$body = '<tr><td colspan="5" style="text-align: center;">'
 				  . TAG_str('no_menu') . '</td></tr>' . LB;
@@ -355,12 +366,14 @@ class TagMenuconfig
 		global $_TABLES, $_TAG_CONF;
 		
 		$menu_name = trim(TAG_post('menu_name'));
+		
 		if ($menu_name == '') {
 			return TAG_str('add_fail');
 		}
 		
 		$menu_tags = TAG_post('menu_tags');
 		$menu_tags = TAG_scanTag('[' . $_TAG_CONF['tag_name'] . ':' . $menu_tags . ']');
+		
 		if (count($menu_tags) == 0) {
 			$tag_ids = '';
 		} else {
@@ -368,7 +381,8 @@ class TagMenuconfig
 			
 			foreach ($menu_tags as $menu_tag) {
 				$temp = TAG_getTagId($menu_tag);
-				if ($temp !== false) {
+				
+				if ($temp !== FALSE) {
 					$tag_ids[] = $temp;
 				}
 			}
@@ -381,17 +395,18 @@ class TagMenuconfig
 		}
 		
 		$parent_id = TAG_post('parent_id');
+		
 		if (!array_key_exists($parent_id, $this->menuList)) {
 			$parent_id = 0;
 		}
 		
 		$dsp_order = $this->getMaxDisplayOrder($parent_id) + 1;
-		
 		$sql = "INSERT INTO {$_TABLES['tag_menu']} "
 			 . "(menu_name, tag_ids, parent_id, dsp_order) "
 			 . "VALUES ('" . addslashes($menu_name) . "', '" . $tag_ids
 			 . "', '" . addslashes($parent_id) . "', '" . $dsp_order . "')";
 		$result = DB_query($sql);
+		
 		return DB_error() ? TAG_str('add_fail') : TAG_str('add_success');
 	}
 	
@@ -401,6 +416,7 @@ class TagMenuconfig
 		
 		$dir     = TAG_get('dir');
 		$menu_id = TAG_get('id');
+		
 		if ($dir == 'up') {
 			$this->heightenDisplayOrder($menu_id);
 			return;
@@ -415,6 +431,7 @@ class TagMenuconfig
 		$parent_id = TAG_post('parent_id');
 		$menu_tags = TAG_scanTag('[' . $_TAG_CONF['tag_name'] . ':' . $menu_tags . ']');
 		$tag_ids   = $this->_getIdList($menu_tags);
+		
 		if (count($tag_ids) > 0) {
 			$tag_ids = implode(',', $tag_ids);
 		} else {
@@ -426,6 +443,7 @@ class TagMenuconfig
 			 . "parent_id = '" . addslashes($parent_id) . "' "
 			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 		$result = DB_query($sql);
+		
 		return DB_error() ? TAG_str('edit_fail') : TAG_str('edit_success');
 	}
 	
@@ -434,21 +452,23 @@ class TagMenuconfig
 		global $_TABLES, $LANG_TAG;
 		
 		$submit = TAG_post('submit');
+		
 		if ($submit !== $LANG_TAG['submit']) {
 			return '';
 		}
 		
 		$menus     = TAG_getMenuList();
-		$menu_id   = TAG_post('menu_id', true, true);
+		$menu_id   = TAG_post('menu_id', TRUE, TRUE);
 		$parent_id = $menus[$menu_id]['parent_id'];
 		$children  = $menus[$menu_id]['child'];
 		
-		// Delete the given menu item
+		// Deletes the given menu item
 		$sql = "DELETE FROM {$_TABLES['tag_menu']} "
 			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 		DB_query($sql);
 		
 		// Chnage the parents of child menus if any
+		
 		if (count($children) > 0) {
 			foreach ($children as $child) {
 				$sql = "UPDATE {$_TABLES['tag_menu']} "
@@ -468,6 +488,7 @@ class TagMenuconfig
 		$sql = "SELECT MAX(dsp_order) AS max FROM {$_TABLES['tag_menu']} "
 			 . "WHERE (parent_id = '" . addslashes($parent_id) . "')";
 		$result = DB_query($sql);
+		
 		if (DB_numRows($result) == 1) {
 			$A = DB_fetchArray($result);
 			return $A['max'];
@@ -477,7 +498,7 @@ class TagMenuconfig
 	}
 	
 	/**
-	* Heighten the display order of a given menu id
+	* Heightens the display order of a given menu id
 	*/
 	function heightenDisplayOrder($menu_id)
 	{
@@ -492,6 +513,7 @@ class TagMenuconfig
 			 . "WHERE (dsp_order < '" . addslashes($dsp_order) . "') "
 			 . "ORDER BY dsp_order DESC LIMIT 1";
 		$result = DB_query($sql);
+		
 		if (DB_numRows($result) == 1) {
 			$B = DB_fetchArray($result);
 			$new_menu_id   = $B['menu_id'];
@@ -504,14 +526,15 @@ class TagMenuconfig
 				  . "SET dsp_order = '" . addslashes($new_dsp_order) . "' "
 				  . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 			DB_query($sql2);
-			return true;
+			
+			return TRUE;
 		}
 		
-		return false;
+		return FALSE;
 	}
 
 	/**
-	* Lower the display order of a given menu id
+	* Lowers the display order of a given menu id
 	*/
 	function lowerDisplayOrder($menu_id)
 	{
@@ -527,6 +550,7 @@ class TagMenuconfig
 			 . "WHERE (dsp_order > '" . addslashes($dsp_order) . "') "
 			 . "ORDER BY dsp_order LIMIT 1";
 		$result = DB_query($sql);
+		
 		if (DB_numRows($result) == 1) {
 			$B = DB_fetchArray($result);
 			$new_menu_id   = $B['menu_id'];
@@ -539,9 +563,10 @@ class TagMenuconfig
 				  . "SET dsp_order = '" . addslashes($new_dsp_order) . "' "
 				  . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 			DB_query($sql2);
-			return true;
+			
+			return TRUE;
 		}
 		
-		return false;
+		return FALSE;
 	}
 }

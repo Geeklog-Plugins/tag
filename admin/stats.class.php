@@ -46,7 +46,7 @@ if (!SEC_hasRights('tag.admin')) {
 			 . TAG_str('access_denied_msg')
 			 . COM_endBlock()
 			 . COM_siteFooter();
-    echo $display;
+    COM_output($display);
     exit;
 }
  
@@ -84,6 +84,7 @@ class TagStats
 			 . "GROUP BY m.tag_id "
 			 . "ORDER BY cnt DESC, tag";
 		$result = DB_query($sql);
+		
 		if (DB_error()) {
 			return $retval . '<p>' . TAG_str('db_error') . '</p>';
 		} else if (DB_numRows($result) == 0) {
@@ -139,8 +140,9 @@ class TagStats
 	{
 		global $_TABLES, $LANG_TAG;
 		
-		// Retrieve request vars
+		// Retrieves request vars
 		$tag_ids = TAG_post('tag_ids', true, true);
+		
 		if (count($tag_ids) == 0) {
 			return '';
 		}
@@ -154,7 +156,8 @@ class TagStats
 		$tag_ids = array_map('addslashes', $tag_ids);
 		$tag_ids = "'" . implode("','", $tag_ids) . "'";
 		
-		// Register banned words into DB
+		// Registers banned words into DB
+		
 		if ($cmd == $LANG_TAG['ban_checked']) {
 			$sql = "INSERT INTO {$_TABLES['tag_badwords']} "
 				 . "SELECT tag FROM {$_TABLES['tag_list']} "
@@ -162,16 +165,15 @@ class TagStats
 			$result = DB_query($sql);
 		}
 		
-		// Delete tags from registered tag list
+		// Deletes tags from registered tag list
 		$sql = "DELETE FROM {$_TABLES['tag_list']} "
 			 . "WHERE (tag_id IN ({$tag_ids}))";
 		$result = DB_query($sql);
-
+		
 		$sql = "DELETE FROM {$_TABLES['tag_map']} "
 			 . "WHERE (tag_id IN ({$tag_ids}))";
 		$result = DB_query($sql);
 		
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
-		
 	}
 }
