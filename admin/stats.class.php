@@ -89,7 +89,6 @@ class TagStats
 			return $retval . '<p>' . TAG_str('no_tag') . '</p>';
 		}
 		
-		$display = COM_siteHeader();
 		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
 		$T->set_file('stats', 'admin_stats.thtml');
 		$T->set_var('xhtml', XHTML);

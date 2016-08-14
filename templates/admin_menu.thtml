@@ -1,0 +1,15 @@
+<p>{lang_desc_admin_menuconfig}</p>
+<p>{add_link}</p>
+
+<table class="plugin">
+	<tr>
+		<th style="text-align: center;">{lang_menu_name}</th>
+		<th style="text-align: center;">{lang_menu_parent}</th>
+		<th style="text-align: center;">{lang_menu_tags}</th>
+		<th style="text-align: center;">{lang_menu_dsp_order}</th>
+		<th style="text-align: center;">{lang_action}</th>
+	</tr>
+	{body}
+</table>
+
+<p>{add_link}</p>

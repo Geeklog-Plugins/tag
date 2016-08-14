@@ -242,6 +242,15 @@ function plugin_install_tag() {
 		 . "', '1', '3', '3', '2', '2')";
 	DB_query($sql);
 	
+	// Add a tag menu block to the site
+	$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, tid, blockorder, onleft, phpblockfn, owner_id, group_id, perm_owner, perm_group, perm_members, perm_anon) "
+		 . "VALUES ('1', '" . addslashes($_TAG_CONF['default_block_name_menu'])
+		 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
+		 . "', 'all', '1', '1', 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
+		 . "', '1', '3', '3', '2', '2')";
+	DB_query($sql);
+	
+
 	// Scan all tags that might already exist in stories in case of re-installation
 	TAG_scanAllStories();
 	

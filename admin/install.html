@@ -71,7 +71,7 @@
 		</tr>
 		<tr>
 			<th>Version</th>
-			<td>0.2.0</td>
+			<td>0.3.0</td>
 		</tr>
 		<tr>
 			<th>Author</th>
@@ -121,6 +121,7 @@
 		<li>If you want to ban certain tags, you can do so in the admin control panel.  Bad words are also case-insensitive.</li>
 		<li>If you would like to display "tag clouds" in your site block, just create a PHP block with the function name being <strong>phpblock_tag_cloud</strong>.<br><strong>NOTE</strong>: Since version 0.2.0, a tag cloud block will be created automatically during installation.</li>
 		<li>The apperance of tag clouds are controlled with templates (in <span class="geeklog">&lt;geeklog&gt;</span>/plugins/tag/templates/) and Cascading Style Sheet (as <span class="public">&lt;public_html&gt;</span>/tag/tag.css).  In case <span class="public">&lt;public_html&gt;</span>/layout/your_theme/tag.css exists, this will be preferred over <span class="public">&lt;public_html&gt;</span>/tag/tag.css.</li>
+		<li>(Version-0.3.0 or later)  If you would like to display a menu based on tags in your site block, just create a PHP block with the function name being <strong>phpblock_tag_menu</strong>.  You can edit menu items in the admin control panel.<br><strong>NOTE</strong>: Since version 0.3.0, a tag menu block will be created automatically during installation.</li>
 	</ul>
 	
 	<h2>Configurations by modifying &lt;geeklog&gt;/plugins/tag/config.php</h2>
@@ -151,7 +152,7 @@
 		<tr>
 			<td>$_TAG_CONF['tag_case_sensitive']</td>
 			<td>false</td>
-			<td>If this is true, the tag "Geeklog" will NOT be identified with the tag "geeklog".</td>
+			<td>If this is true, the tag "Geeklog" will NOT be identified with the tag "geeklog".  When you change this option, you should re-install tag plugin.</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_stemming']</td>
@@ -193,6 +194,26 @@
 			</td>
 			<td>Thresholds of frequency of each tag cloud level.  All tag clouds are classified in 10 levels (level 0..level 9).  Those tags whose number is equal to or smaller than $_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>] belong to level <strong>X</strong>.  Each level corresponds to its own class in CSS(Cascading Style Sheet), so you can display in different styles tags according to their levels.</td>
 		</tr>
+		<tr>
+			<td>$_TAG_CONF['replace_underscore']</td>
+			<td>false</td>
+			<td>Whether to replace an underscore included in tag texts with a space</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['num_keywords']</td>
+			<td>0</td>
+			<td>The number of key words to be included in &lt;meta name="keywords" content="foo,bar"&gt; tag.  If the number is 0, the meta tag won't be included.</td>
+		</tr>
+		<tr>
+			<td><a name="CONF_publish_as_template_vars">$_TAG_CONF['publish_as_template_vars']</a></td>
+			<td>false</td>
+			<td>If this is set to true, tags will NOT be displayed where they should be in the artcile, but will be published as template vars ({tag_label} and {tag_part}) which can be used in 'storytext.thtml', 'featuredstorytext.thtml', and 'archivestorytext.thtml'.  If this is set to false, tags will be displayed in the article.  <strong>This feature is valid for Geeklog-1.4.1 or later.</strong></td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['menu_indenter']</td>
+			<td>&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+			<td>A string to indent an item of tag menu</td>
+		</tr>
 	</table>
 	
 	<h2>REVISION HISTORY</h2>
@@ -202,6 +223,16 @@
 			<th>Version</th>
 			<th>Date</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="center">0.3.0</td>
+			<td class="center">2008-01-22</td>
+			<td>
+				<span class="new">New!</span> Added a menu based on tags (experimental).<br>
+				<span class="new">New!</span> Added an option to replace an underscore ('_') included in tag texts with a space.<br>
+				<span class="new">New!</span> Added an option to publish most frequent tags in the &lt;meta name="keywords" content="foo,bar"&gt; tag in the head.<br>
+				<span class="new">New!</span> Added an option to publish tags as template vars.  See <a href="#CONF_publish_as_template_vars">the above</a> for detail.<br>
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.2.0</td>

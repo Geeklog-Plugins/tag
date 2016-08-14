@@ -40,11 +40,11 @@ require_once $_CONF['path_system'] . 'classes/navbar.class.php';
 if (!SEC_hasRights('tag.admin')) {
     // Someone is trying to illegally access this page
     COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
-    $display  = COM_siteHeader();
-    $display .= COM_startBlock($LANG_TAG['access_denied']);
-    $display .= $LANG_TAG['access_denied_msg'];
-    $display .= COM_endBlock();
-    $display .= COM_siteFooter(true);
+    $display = COM_siteHeader()
+			 . COM_startBlock($LANG_TAG['access_denied'])
+			 . $LANG_TAG['access_denied_msg']
+			 . COM_endBlock()
+			 . COM_siteFooter(true);
     echo $display;
     exit;
 }
@@ -58,8 +58,8 @@ if (!defined('XHTML')) {
 }
 
 $this_script = $_CONF['site_admin_url'] . '/plugins/tag/index.php';
-//$commands = array('stats', 'badword', 'menuconfig');
-$commands = array('stats', 'badword');
+$commands = array('stats', 'badword', 'menuconfig');
+//$commands = array('stats', 'badword');
 $actions  = array('view', 'add', 'edit', 'delete', 'doAdd', 'doEdit', 'doDelete');
 
 // Retrieve request vars
@@ -95,7 +95,7 @@ switch ($action) {
 		$msg = $obj->doDelete();
 		break;
 	default:
-		$msg = '&nbsp;';
+		$msg = '';
 		break;
 }
 
@@ -105,7 +105,9 @@ $T = new Template($_CONF['path'] . 'plugins/tag/templates');
 $T->set_file('admin', 'admin.thtml');
 $T->set_var('xhtml', XHTML);
 $T->set_var('header', $LANG_TAG['admin']);
-$T->set_var('msg', $msg);
+if ($msg != '') {
+	$T->set_var('msg', '<p>' . $msg . '</p>');
+}
 
 // Navbar
 $navbar = new navbar;

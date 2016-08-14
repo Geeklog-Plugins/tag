@@ -50,7 +50,7 @@ $_TAG_CONF = array();
 
 // Plugin info
 
-$_TAG_CONF['pi_version'] = '0.2.0';						// Plugin Version
+$_TAG_CONF['pi_version'] = '0.3.0';						// Plugin Version
 $_TAG_CONF['gl_version'] = '1.4.0';						// GL Version plugin for
 $_TAG_CONF['pi_url']     = 'http://mystral-kk.net/';	// Plugin Homepage
 
@@ -137,5 +137,47 @@ $_TAG_CONF['tag_cloud_threshold'][5]  = 6;
 $_TAG_CONF['tag_cloud_threshold'][6]  = 7;
 $_TAG_CONF['tag_cloud_threshold'][7]  = 8;
 $_TAG_CONF['tag_cloud_threshold'][8]  = 9;
+
+/**
+* Whether to replace an underscore included in tag texts with a space
+*/
+$_TAG_CONF['replace_underscore'] = false;
+
+/**
+* The number of key words to be included in <meta name="keywords"
+* content="foo,bar"> tag
+*/
+$_TAG_CONF['num_keywords'] = 0;
+
+/**
+* Whether to publish tags as template vars which can be used in
+* 'storytext.thtml', 'featuredstorytext.thtml' and 'archivestorytext.thtml'.
+* This idea was provided by dengen.
+*
+* CAUTION: This feature is valid for Geeklog-1.4.1 or later.
+*/
+$_TAG_CONF['publish_as_template_vars'] = false;
+
+/**
+* This is work vars and should be left untouched by users
+*/
+$_TAG_CONF['template_vars'] = array();
+
+/**
+* Configurations for tag menu (Tag-0.3.0 or later)
+*/
+
+/**
+* Default name of a tag menu block which will be created during the
+* installation.  If you use Geeklog-1.4.1 or later and disable/enable the tag
+* plugin, the block named $_TAG_CONF['default_block_name'] will also
+* be disabled/enabled automatically.
+*/
+$_TAG_CONF['default_block_name_menu'] = 'tag_menu_block';
+
+/**
+* Character(s) for indenting tag menu item
+*/
+$_TAG_CONF['menu_indenter'] = '&nbsp;&nbsp;&nbsp;';
 
 ?>

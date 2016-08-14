@@ -74,7 +74,7 @@
 		</tr>
 		<tr>
 			<th>バージョン</th>
-			<td>0.2.0</td>
+			<td>0.3.0</td>
 		</tr>
 		<tr>
 			<th>作者</th>
@@ -125,6 +125,7 @@
 		<li>ある種のタグを禁止したい場合には，管理者メニューから禁止できます。やはり，大文字と小文字は区別されません。</li>
 		<li>サイトのブロックに「タグクラウド」を表示する場合は，PHPブロックを作成し，関数名に<strong>phpblock_tag_cloud</strong>を入力します。<br><strong>メモ</strong>：バージョン0.2.0以降，タグクラウドブロックはインストール時に自動的に作成されます。</li>
 		<li>タグクラウドの外観は，<span class="geeklog">&lt;geeklog&gt;</span>/plugins/tag/templates/にあるテンプレートとCSS(<span class="public">&lt;public_html&gt;</span>/tag/tag.css)で変更できます。なお，<span class="public">&lt;public_html&gt;</span>/layout/your_theme/tag.cssが存在する場合は，そちらの方が優先されます。</li>
+		<li>(バージョン0.3.0以降)  サイトのブロックに「タグメニュー」を表示する場合は，PHPブロックを作成し，関数名に<strong>phpblock_tag_menu</strong>を入力します。メニュー項目はコントロールパネルで編集できます。<br><strong>メモ</strong>：バージョン0.3.0以降，タグメニューブロックはインストール時に自動的に作成されます。</li>
 	</ul>
 	
 	<h2>&lt;geeklog&gt;/plugins/tag/config.phpの編集による設定</h2>
@@ -155,7 +156,7 @@
 		<tr>
 			<td>$_TAG_CONF['tag_case_sensitive']</td>
 			<td>false</td>
-			<td>trueにすると，たとえば，"Geeklog"というタグは"geeklog"というタグと違うものと見なされます。</td>
+			<td>trueにすると，たとえば，"Geeklog"というタグは"geeklog"というタグと違うものと見なされます。このオプションを変更した場合は，Tagプラグインをインストールし直してください。</td>
 		</tr>
 		<tr>
 			<td>$_TAG_CONF['tag_stemming']</td>
@@ -197,6 +198,26 @@
 			</td>
 			<td>タグクラウドの個々のタグのレベルを決めるタグの出現回数の上限値。タグクラウドのタグは10段階に分けられています(level 0からlevel 9まで)。タグの数が$_TAG_CONF['tag_cloud_threshold'][<strong>X</strong>]以下のタグはレベル<strong>X</strong>に属します。個々のレベルはCSS（カスケイディングスタイルシート）のクラスと対応しているので，レベルに応じてタグのスタイルを変えることができます。</td>
 		</tr>
+		<tr>
+			<td>$_TAG_CONF['replace_underscore']</td>
+			<td>false</td>
+			<td>タグに含まれるアンダースコア('_')をスペースに置き換えて表示するかどうかを決めます。</td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['num_keywords']</td>
+			<td>0</td>
+			<td>&lt;meta name="keywords" content="foo,bar"&gt;タグに出力するキーワードの数。0にすると，このメタタグは出力されません。</td>
+		</tr>
+		<tr>
+			<td><a name="CONF_publish_as_template_vars">$_TAG_CONF['publish_as_template_vars']</a></td>
+			<td>false</td>
+			<td>falseにすると，タグは記事中に表示されず，テンプレート変数({tag_label}と{tag_part})として，'storytext.thtml', 'featuredstorytext.thtml', 'archivestorytext.thtml'の中で参照できるようになります。trueにすると，タグとして記事中に表示されます。<strong>この機能はGeeklog-1.4.1以降で有効です。</strong></td>
+		</tr>
+		<tr>
+			<td>$_TAG_CONF['menu_indenter']</td>
+			<td>&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+			<td>タグメニューの項目をインデントする際に使用する文字列。</td>
+		</tr>
 	</table>
 	
 	<h2>改訂履歴</h2>
@@ -206,6 +227,16 @@
 			<th>バージョン</th>
 			<th>公開日</th>
 			<th>説明</th>
+		</tr>
+		<tr>
+			<td class="center">0.3.0</td>
+			<td class="center">2008-01-22</td>
+			<td>
+				<span class="new">New!</span> タグを利用したメニューを試験的に実装しました。<br>
+				<span class="new">New!</span> タグに含まれるアンダースコア('_')をスペースに置き換えて表示するオプションを追加しました。<br>
+				<span class="new">New!</span> 頻度の高いタグを&lt;meta name="keywords" content="foo,bar"&gt;タグの中に出力するオプションを追加しました。<br>
+				<span class="new">New!</span> タグをテンプレート変数として出力するオプションを追加しました。詳細は<a href="#CONF_publish_as_template_vars">こちら</a>をご覧ください。<br>
+			</td>
 		</tr>
 		<tr>
 			<td class="center">0.2.0</td>

@@ -75,7 +75,6 @@ class TagBadword
 		global $_CONF, $_TABLES;
 		
 		$body = '';
-		$display = COM_siteHeader();
 		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
 		$T->set_file('badword', 'admin_badword.thtml');
 		$T->set_var('xhtml', XHTML);

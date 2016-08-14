@@ -41,7 +41,7 @@ $langfile = $_CONF['path'] . 'plugins/tag/language/' . $_CONF['language'] . '.ph
 if (file_exists($langfile)) {
     include_once $langfile;
 } else {
-    include_once $_CONF['path'] . 'plugins/tag/language/english.php';
+    include_once $_CONF['path'] . 'plugins/tag/language/english_utf-8.php';
 }
 
 /*
@@ -165,12 +165,23 @@ function plugin_upgrade_tag() {
 	
 	// Do upgrading
 	switch ($pi_version) {
-		case '0.1.0':
+		case '0.1.0':	// 0.1.0 --> 0.2.0
 			$sql = "CREATE INDEX idx_tag_list_tag ON {$_TABLES['tag_list']} (tag)";
 			DB_query($sql);
 			$sql = "CREATE INDEX idx_tag_map_tag_id ON {$_TABLES['tag_map']} (tag_id)";
 			DB_query($sql);
-			
+
+			/* Fall through to the next 'case' */
+		case '0.2.0':	// 0.2.0 --> 0.3.0
+			$sql = "CREATE TABLE " . $_TABLES['tag_menu'] . " ("
+				 . "menu_id INT(10) NOT NULL AUTO_INCREMENT,"
+				 . "menu_name VARCHAR(255) NOT NULL DEFAULT '',"
+				 . "tag_ids VARCHAR(255) NOT NULL DEFAULT '',"
+				 . "parent_id INT(10) NOT NULL DEFAULT '0',"
+				 . "dsp_order INT(10) NOT NULL DEFAULT '0',"
+				 . "PRIMARY KEY menu_id(menu_id)"
+				 . ")";
+			DB_query($sql);
 			break;
 		
 		default:
@@ -200,7 +211,7 @@ function plugin_upgrade_tag() {
 *
 */  
 function plugin_uninstall_tag($installCheck = '') {
-    global $_TABLES, $LANG_TAG;
+    global $_TABLES, $_TAG_CONF, $LANG_TAG;
 
     // $FEATURES and $TABLES have to be changed accodrding to your plugin
     $pi_name  = 'tag';
@@ -220,8 +231,11 @@ function plugin_uninstall_tag($installCheck = '') {
     	
 	// Ok to proceed and delete plugin
 	
-	// Delete tag cloud block
+	// Delete default tag cloud block
 	DB_query("DELETE FROM {$_TABLES['blocks']} WHERE (name = '" . addslashes($_TAG_CONF['default_block_name']) . "') AND (type = 'phpblock')");
+	
+	// Delete default tag menu block
+	DB_query("DELETE FROM {$_TABLES['blocks']} WHERE (name = '" . addslashes($_TAG_CONF['default_block_name_menu']) . "') AND (type = 'phpblock')");
 	
     // Unregister the plugin with Geeklog
     COM_errorLog('Attempting to unregister the tag plugin from Geeklog', 1);
@@ -348,10 +362,11 @@ if (!function_exists('COM_truncate')) {
 }
 
 /**
-* Append a link to CSS file to <head> section
+* Append a link to CSS file and <meta name="keywords" content="foo,bar"> tag
+* to <head> section
 */
 function plugin_getheadercode_tag() {
-	global $_CONF, $_USER;
+	global $_CONF, $_USER, $_TAG_CONF;
 	
 	$theme = isset($_USER['theme']) ? $_USER['theme'] : $_CONF['theme'];
 	clearstatcache();
@@ -361,7 +376,18 @@ function plugin_getheadercode_tag() {
 		$url = $_CONF['site_url'] . '/tag/tag.css';
 	}
 	
-	return '<link rel="stylesheet" type="text/css" href="' . $url . '">';
+	$retval = '<link rel="stylesheet" type="text/css" href="' . $url . '"' . XHTML . '>';
+	if ($_TAG_CONF['num_keywords'] > 0) {
+		$keywords = TAG_getKeywords($_TAG_CONF['num_keywords']);
+		if (count($keywords) > 0) {
+			$keywords = array_map('TAG_escape', $keywords);
+			$retval .= LB
+					.  "\t" . '<meta name="keywords" content="'
+					.  implode(',', $keywords) . '"' . XHTML . '>';
+		}
+	}
+	
+	return $retval;
 }
 
 /**
@@ -376,8 +402,28 @@ function plugin_enablestatechange_tag($state) {
 	$state = ($state === true) ? 1 : 0;
 	$sql = "UPDATE {$_TABLES['blocks']} "
 		 . "SET is_enabled = '" . addslashes($state) . "' "
-		 . "WHERE (name = '" . addslashes($_TAG_CONF['default_block_name']) . "')";
-	$result = DB_query($sql);
+		 . "WHERE (name = '" . addslashes($_TAG_CONF['default_block_name']) . "') "
+		 . "OR (name = '" . addslashes($_TAG_CONF['default_block_name_menu']) . "')";
+	 DB_query($sql);
+}
+
+/**
+* Add template vars to 'storytext.thtml', 'featuredstorytext.thtml' and
+* 'archivestorytext.thtml'.
+*
+* @note This function works for Geeklog-1.4.1 or later.
+*
+* Vars available in templates are {tag_label} and {tag_part}.
+*/
+if ($_TAG_CONF['publish_as_template_vars'] === true) {
+	function plugin_templatesetvars_tag($templatename, &$template) {
+		global $_TAG_CONF;
+		
+		if (in_array($templatename, array('featuredstorytext', 'storytext', 'archivestorytext'))) {
+			$template->set_var('tag_label', $_TAG_CONF['template_vars']['tag_label']);
+			$template->set_var('tag_part', $_TAG_CONF['template_vars']['tag_part']);
+		}
+	}
 }
 
 /**
@@ -583,6 +629,9 @@ function plugin_autotags_tag($cmd, $content = '', $autotag = '') {
 					if ($_TAG_CONF['tag_stemming'] === true) {
 						$tag = TAG_stem($tag);
 					}
+					if ($_TAG_CONF['replace_underscore'] === true) {
+						$tag = str_replace('_', ' ', $tag);
+					}
 					$url = $_CONF['site_url'] . '/tag/index.php?tag='
 						 . rawurlencode($tag);
 					$tag_part .= '<a class="tag_link" href="' . COM_buildURL($url)
@@ -592,8 +641,17 @@ function plugin_autotags_tag($cmd, $content = '', $autotag = '') {
 			
 			$tag_part = rtrim($tag_part);
 			
-			if ($tag_part != '') {
-				$content = str_replace($tagstr, $LANG_TAG['display_label'] . $tag_part, $content);
+			// Set work vars to be included in templates
+			$_TAG_CONF['template_vars']['tag_part']  = $tag_part;
+			$_TAG_CONF['template_vars']['tag_label'] = $LANG_TAG['display_label'];
+
+			if ($_TAG_CONF['publish_as_template_vars'] === true) {
+				// Replace a tag part with a null string
+				$content = str_replace($tagstr, '', $content);
+			} else {
+				if ($tag_part != '') {
+					$content = str_replace($tagstr, $LANG_TAG['display_label'] . $tag_part, $content);
+				}
 			}
 		}
 	}
@@ -1043,6 +1101,41 @@ function TAG_rescanTag($tag) {
 }
 
 /**
+* Select most frequent tags as key words
+*
+* @todo   some kind of caching mechanism will be useful
+*
+* @param  int             $num_keywords - number of key words to be included in <head>
+* @return array of string
+*/
+function TAG_getKeywords($num_keywords) {
+	global $_TABLES;
+	
+	$retval = array();
+	
+	$num_keywords = intval($num_keywords);
+	if ($num_keywords < 0 OR $num_keywords > 100) {
+		$num_keywords = 10;
+	}
+	
+	$sql = "SELECT L.tag, COUNT(m.tag_id) AS cnt "
+		 . "FROM {$_TABLES['tag_map']} AS m "
+		 . "LEFT JOIN {$_TABLES['tag_list']} AS L "
+		 . "ON m.tag_id = L.tag_id "
+		 . "GROUP BY m.tag_id "
+		 . "ORDER BY cnt DESC "
+		 . "LIMIT {$num_keywords}";
+	$result = DB_query($sql);
+	if (!DB_error()) {
+		while (($A = DB_fetchArray($result)) !== false) {
+			$retval[] = $A['tag'];
+		}
+	}
+	
+	return $retval;
+}
+
+/**
 * Scan all stories for tags
 *
 * @note This is a very costly process, and should be used sparingly
@@ -1078,22 +1171,43 @@ function TAG_scanAllStories() {
 }
 
 /**
-* Display a tag cloud in the site block
+* Return menu list
 *
-* @access public
-* @param int     $limit: max number of tags to be displayed
-* @return string HTML
+* @return array of (
+*             int          menu_id,
+*             string       menu_name,
+*             array of int tag_ids(array of tag ids),
+*             int          parent_id,
+*             int          dsp_order,
+*             array of int child (array of menu_ids)
+*         )
 */
-function phpblock_tag_cloud($limit = 0) {
+function TAG_getMenuList() {
 	global $_CONF, $_TABLES, $_TAG_CONF;
 	
-	// Check the max number of clouds
-	$limit = (int) $limit;
-	if ($limit <= 0) {
-		$limit = $_TAG_CONF['max_tag_cloud_in_block'];
+	$nodes = array();
+	$sql = "SELECT * FROM {$_TABLES['tag_menu']} "
+		 . "ORDER BY parent_id, dsp_order";
+	$result = DB_query($sql);
+	if (DB_error() OR DB_numRows($result) == 0) {
+		return $nodes;
 	}
 	
-	return TAG_getTagCloud($limit, true);
+	while (($A = DB_fetchArray($result)) !== false) {
+		$A['child'] = array();
+		
+		if (trim($A['tag_ids']) == '') {
+			$A['tag_ids'] = array();
+		} else {
+			$A['tag_ids'] = explode(',', $A['tag_ids']);
+		}
+		if ($A['parent_id'] != 0) {
+			$nodes[$A['parent_id']]['child'][] = $A['menu_id'];
+		}
+		$nodes[$A['menu_id']] = $A;
+	}
+	
+	return $nodes;
 }
 
 /**
@@ -1130,8 +1244,8 @@ function TAG_getStoryTitle($sid) {
 *
 * @access private
 */
-function TAG_build_tag_menu(&$nodes, &$node, $parent_tag_ids, $level) {
-	global $_CONF;
+function TAG_buildTagMenu(&$nodes, &$node, $parent_tag_ids, $level) {
+	global $_CONF, $_TAG_CONF;
 	
 	$retval = '';
 	
@@ -1140,16 +1254,35 @@ function TAG_build_tag_menu(&$nodes, &$node, $parent_tag_ids, $level) {
 	sort($tag_ids);
 	$tag_ids4url = implode('_', $tag_ids);
 	$url = $_CONF['site_url'] . '/tag/menu.php?tag=' . $tag_ids4url;
-	$url = COM_buildURL($url);
-	$retval .= str_repeat('&nbsp;&nbsp;&nbsp;', $level) . '<a href="' . $url . '">'
-			.  TAG_escape($node['menu_name']) . '</a><br' . XHTML . '>' . LB;
-	if (count($node['child']) > 0) {
-		foreach ($node['child'] as $child) {
-			$retval .= TAG_build_tag_menu($nodes, $nodes[$child], $tag_ids, $level + 1);
-		}
+	
+	$retval .= str_repeat($_TAG_CONF['menu_indenter'], $level)
+			.  '<a class="bl_tag_menu_item" href="' . COM_buildURL($url) . '">'
+			. TAG_escape($node['menu_name']) . '</a><br' . XHTML . '>' . LB;
+	
+	foreach ($node['child'] as $child) {
+		$retval .= TAG_buildTagMenu($nodes, $nodes[$child], $tag_ids, $level + 1);
 	}
 	
 	return $retval;
+}
+
+/**
+* Display a tag cloud in the site block
+*
+* @access public
+* @param int     $limit: max number of tags to be displayed
+* @return string HTML
+*/
+function phpblock_tag_cloud($limit = 0) {
+	global $_CONF, $_TABLES, $_TAG_CONF;
+	
+	// Check the max number of clouds
+	$limit = (int) $limit;
+	if ($limit <= 0) {
+		$limit = $_TAG_CONF['max_tag_cloud_in_block'];
+	}
+	
+	return TAG_getTagCloud($limit, true);
 }
 
 /**
@@ -1160,42 +1293,22 @@ function TAG_build_tag_menu(&$nodes, &$node, $parent_tag_ids, $level) {
 function phpblock_tag_menu() {
 	global $_CONF, $_TABLES, $_TAG_CONF;
 	
-	$sql = "SELECT * FROM {$_TABLES['tag_menu']} "
-		 . "ORDER BY parent_id, dsp_order";
-	$result = DB_query($sql);
-	if (DB_error()) {
-		return TAG_str('db_error');
-	} else if (DB_numRows($result) == 0) {
-		return TAG_str('no_menu');
+	$nodes  = TAG_getMenuList();
+	if (count($nodes) == 0) {
+		return '';
 	}
 	
-	$nodes  = array();
-	$retval = '';
-	
-	while (($A = DB_fetchArray($result)) !== false) {
-		$A['child'] = array();
-		
-		if (trim($A['tag_ids']) == '') {
-			$A['tag_ids'] = array();
-		} else {
-			$A['tag_ids'] = explode(',', $A['tag_ids']);
-		}
-		if ($A['parent_id'] != 0) {
-			$nodes[$A['parent_id']]['child'][] = $A['menu_id'];
-		}
-		$nodes[$A['menu_id']] = $A;
-	}
+	$states_index = 0;
+	$retval = '<div class="bl_tag_menu">' . LB;
 	
 	foreach ($nodes as $node) {
 		if ($node['parent_id'] > 0) {
 			break;
 		}
-		$retval .= TAG_build_tag_menu($nodes, $node, array(), 0);
+		$retval .= TAG_buildTagMenu($nodes, $node, array(), 0);
 	}
 	
-	$retval = '<div class="tag_menu">' . LB
-			.  $retval
-			.  '</div>' . LB;
+	$retval .= '</div>' . LB;
 	
 	return $retval;
 }

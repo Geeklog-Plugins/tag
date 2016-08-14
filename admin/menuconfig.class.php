@@ -169,6 +169,12 @@ class TagMenuconfig
 		return $retval;
 	}
 	
+	/**
+	* Common function for adding and editing a menu item
+	*
+	* @param int $id        - menu id
+	* @param int $parent_id - menu id of the parent menu
+	*/
 	function _addEdit($id, $parent_id)
 	{
 		global $_CONF, $_TABLES;
@@ -211,7 +217,8 @@ class TagMenuconfig
 	
 	function add()
 	{
-		return $this->_addEdit(0, 0);
+		$parent_id = TAG_get('pid', true);
+		return $this->_addEdit(0, $parent_id);
 	}
 	
 	function edit()
@@ -257,51 +264,89 @@ class TagMenuconfig
 		return $T->finish($T->get_var('output'));
 	}
 	
+	function _subView(&$nodes, &$node, $level, &$sw) {
+		global $_CONF;
+		
+		$this_script = $_CONF['site_admin_url'] . '/plugins/tag/index.php';
+		$retval = '<tr><td>' . str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $level)
+				. TAG_escape($node['menu_name']) . '</td><td>';
+		$retval .= ($node['parent_id'] == 0) ? TAG_str('no_parent') : TAG_escape($nodes[$node['parent_id']]['menu_name']);
+		$retval .= '</td><td>' 
+				. TAG_escape(implode(', ', array_map('TAG_getTagName', $node['tag_ids'])))
+				. '</td><td style="text-align: center;">' . TAG_escape($node['dsp_order'])
+				. '</td>';
+		
+		$add_link    = $this_script . '?cmd=menuconfig&amp;action=add&amp;pid='
+					 . $node['menu_id'];
+		$edit_link   = $this_script . '?cmd=menuconfig&amp;action=edit&amp;id='
+					 . $node['menu_id'] . '&amp;pid=' . $node['parent_id'];
+		$delete_link = $this_script . '?cmd=menuconfig&amp;action=delete&amp;id='
+					 . $node['menu_id'];
+		$up_link     = $this_script . '?cmd=menuconfig&amp;action=doEdit&amp;id='
+					 . $node['menu_id'] . '&amp;dir=up';
+		$down_link   = $this_script . '?cmd=menuconfig&amp;action=doEdit&amp;id='
+					 . $node['menu_id'] . '&amp;dir=down';
+		$retval .= '<td style="text-align: center;"><a href="' . $edit_link
+				.  '">' . TAG_str('edit') . '</a>&nbsp;&nbsp;<a href="'
+				.  $delete_link . '">' . TAG_str('delete') .  '</a>&nbsp;&nbsp;'
+				.  '<a href="' . $add_link . '">' . TAG_str('add_child')
+				.  '</a>&nbsp;&nbsp;<a href="' . $up_link . '">' . TAG_str('order_up')
+				.  '</a>&nbsp;&nbsp;<a href="' . $down_link . '">' . TAG_str('order_down')
+				.  '</a></td></tr>' . LB;
+		$sw = ($sw == 1) ? 2 : 1;
+		
+		if (count($node['child']) > 0) {
+			foreach ($node['child'] as $child_id) {
+				$retval .= $this->_subView($nodes, $nodes[$child_id], $level + 1, $sw);
+			}
+		}
+		
+		return $retval;
+	}
+	
 	function view()
 	{
 		global $_CONF, $_TABLES, $LANG_TAG;
 		
+		$T = new Template($_CONF['path'] . 'plugins/tag/templates');
+		$T->set_file('view', 'admin_menu.thtml');
+		
 		$this_script = $_CONF['site_admin_url'] . '/plugins/tag/index.php';
-		$add_link = '<p><a href="' . $this_script . '?cmd=menuconfig&amp;action=add'
-				  . '">' . TAG_str('add') . '</a></p>' . LB;
+		$T->set_var(
+			'add_link',
+			'<a href="' . $this_script . '?cmd=menuconfig&amp;action=add'
+				. '">' . TAG_str('add') . '</a>'
+		);
+		$T->set_var('lang_desc_admin_menuconfig', TAG_str('desc_admin_menuconfig'));
+		$T->set_var('lang_menu_name', TAG_str('menu_name'));
+		$T->set_var('lang_menu_parent', TAG_str('menu_parent'));
+		$T->set_var('lang_menu_tags', TAG_str('menu_tags'));
+		$T->set_var('lang_menu_dsp_order', TAG_str('menu_dsp_order'));
+		$T->set_var('lang_action', TAG_str('action'));
 		
-		$retval = $add_link . LB;
-		$sql = "SELECT * FROM {$_TABLES['tag_menu']} "
-			 . "ORDER BY parent_id, dsp_order";
-		$result = DB_query($sql);
-		if (DB_error()) {
-			return $retval . TAG_str('db_error');
-		} else if (DB_numRows($result) == 0) {
-			return $retval . TAG_str('no_menu');
+		
+		$menus = TAG_getMenuList();
+		if (count($menus) == 0) {
+			$body = '<tr><td colspan="5" style="text-align: center;">'
+				  . TAG_str('no_menu') . '</td></tr>' . LB;
+		} else {
+			$sw   = 1;
+			$body = '';
+			
+			foreach ($menus as $menu) {
+				if ($menu['parent_id'] > 0) {
+					break;
+				} else {
+					$level = 0;
+					$body .= $this->_subView($menus, $menu, $level, $sw);
+				}
+			}
 		}
 		
-		$retval .= '<table class="plugin">' . LB
-				.  '<tr><th>' . TAG_str('menu_name') . '</th><th>'
-				.  TAG_str('menu_parent') . '</th><th>' . TAG_str('menu_tags')
-				.  '</th><th>' . TAG_str('menu_dsp_order') . '</th><th>'
-				.  TAG_str('action'). '</th></tr>' . LB;
-		$sw = 1;
+		$T->set_var('body', $body);
+		$T->parse('output', 'view');
 		
-		while (($A = DB_fetchArray($result)) !== false) {
-			$edit_link = $this_script . '?cmd=menuconfig&amp;action=edit&amp;id='
-					   . $A['menu_id'] . '&amp;pid=' . $A['parent_id'];
-			$delete_link = $this_script . '?cmd=menuconfig&amp;action=delete&amp;id='
-						 . $A['menu_id'];
-			$retval .= '<tr class="pluginRow' . $sw . '"><td>'
-					.  TAG_escape($A['menu_name']) . '</td><td>'
-					.  TAG_escape($this->menuList[$A['parent_id']]) . '</td><td>'
-					.  TAG_escape($this->_getTags($A['menu_id']))
-					.  '</td><td>' . TAG_escape($A['dsp_order']) . '</td>'
-					.  '<td><a href="' . $edit_link . '">' . TAG_str('edit') . '</a>'
-					.  '&nbsp;&nbsp;<a href="' . $delete_link . '">' . TAG_str('delete')
-					.  '</a></td></tr>' . LB;
-			$sw = ($sw == 1) ? 2 : 1;
-		}
-		
-		$retval .= '</table>' . LB
-				.  $add_link . LB;
-		
-		return $retval;
+		return $T->finish($T->get_var('output'));
 	}
 	
 	function doAdd()
@@ -339,7 +384,7 @@ class TagMenuconfig
 			$parent_id = 0;
 		}
 		
-		$dsp_order = TAG_post('dsp_order');
+		$dsp_order = $this->getMaxDisplayOrder($parent_id) + 1;
 		
 		$sql = "INSERT INTO {$_TABLES['tag_menu']} "
 			 . "(menu_name, tag_ids, parent_id, dsp_order) "
@@ -352,6 +397,16 @@ class TagMenuconfig
 	function doEdit()
 	{
 		global $_TABLES, $_TAG_CONF;
+		
+		$dir     = TAG_get('dir');
+		$menu_id = TAG_get('id');
+		if ($dir == 'up') {
+			$this->heightenDisplayOrder($menu_id);
+			return;
+		} else if ($dir == 'down') {
+			$this->lowerDisplayOrder($menu_id);
+			return;
+		}
 		
 		$menu_id   = TAG_post('menu_id');
 		$menu_name = TAG_post('menu_name');
@@ -382,11 +437,111 @@ class TagMenuconfig
 			return '';
 		}
 		
-		$menu_id = TAG_post('menu_id', true, true);
+		$menus     = TAG_getMenuList();
+		$menu_id   = TAG_post('menu_id', true, true);
+		$parent_id = $menus[$menu_id]['parent_id'];
+		$children  = $menus[$menu_id]['child'];
+		
+		// Delete the given menu item
 		$sql = "DELETE FROM {$_TABLES['tag_menu']} "
 			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
 		DB_query($sql);
+		
+		// Chnage the parents of child menus if any
+		if (count($children) > 0) {
+			foreach ($children as $child) {
+				$sql = "UPDATE {$_TABLES['tag_menu']} "
+					 . "SET parent_id = '" . addslashes($parent_id) . "' "
+					 . "WHERE (menu_id = '" . addslashes($child) . "')";
+				DB_query($sql);
+			}
+		}
+		
 		return DB_error() ? TAG_str('delete_fail') : TAG_str('delete_success');
+	}
+	
+	function getMaxDisplayOrder($parent_id)
+	{
+		global $_TABLES;
+		
+		$sql = "SELECT MAX(dsp_order) AS max FROM {$_TABLES['tag_menu']} "
+			 . "WHERE (parent_id = '" . addslashes($parent_id) . "')";
+		$result = DB_query($sql);
+		if (DB_numRows($result) == 1) {
+			$A = DB_fetchArray($result);
+			return $A['max'];
+		} else {
+			return 0;
+		}
+	}
+	
+	/**
+	* Heighten the display order of a given menu id
+	*/
+	function heightenDisplayOrder($menu_id)
+	{
+		global $_TABLES;
+		
+		$sql = "SELECT dsp_order FROM {$_TABLES['tag_menu']} "
+			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
+		$result = DB_query($sql);
+		$A = DB_fetchArray($result);
+		$dsp_order = $A['dsp_order'];
+		$sql = "SELECT menu_id, dsp_order FROM {$_TABLES['tag_menu']} "
+			 . "WHERE (dsp_order < '" . addslashes($dsp_order) . "') "
+			 . "ORDER BY dsp_order DESC LIMIT 1";
+		$result = DB_query($sql);
+		if (DB_numRows($result) == 1) {
+			$B = DB_fetchArray($result);
+			$new_menu_id   = $B['menu_id'];
+			$new_dsp_order = $B['dsp_order'];
+			$sql1 = "UPDATE {$_TABLES['tag_menu']} "
+				  . "SET dsp_order = '" . addslashes($dsp_order) . "' "
+				  . "WHERE (menu_id = '" . addslashes($new_menu_id) . "')";
+			DB_query($sql1);
+			$sql2 = "UPDATE {$_TABLES['tag_menu']} "
+				  . "SET dsp_order = '" . addslashes($new_dsp_order) . "' "
+				  . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
+			DB_query($sql2);
+			return true;
+		}
+		
+		return false;
+	}
+
+	/**
+	* Lower the display order of a given menu id
+	*/
+	function lowerDisplayOrder($menu_id)
+	{
+		global $_TABLES;
+		
+		$sql = "SELECT dsp_order FROM {$_TABLES['tag_menu']} "
+			 . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
+		$result = DB_query($sql);
+		$A = DB_fetchArray($result);
+		$dsp_order = $A['dsp_order'];
+		
+		$sql = "SELECT menu_id, dsp_order FROM {$_TABLES['tag_menu']} "
+			 . "WHERE (dsp_order > '" . addslashes($dsp_order) . "') "
+			 . "ORDER BY dsp_order LIMIT 1";
+		$result = DB_query($sql);
+		if (DB_numRows($result) == 1) {
+			$B = DB_fetchArray($result);
+			$new_menu_id   = $B['menu_id'];
+			$new_dsp_order = $B['dsp_order'];
+			$sql1 = "UPDATE {$_TABLES['tag_menu']} "
+				  . "SET dsp_order = '" . addslashes($dsp_order) . "' "
+				  . "WHERE (menu_id = '" . addslashes($new_menu_id) . "')";
+			DB_query($sql1);
+			$sql2 = "UPDATE {$_TABLES['tag_menu']} "
+				  . "SET dsp_order = '" . addslashes($new_dsp_order) . "' "
+				  . "WHERE (menu_id = '" . addslashes($menu_id) . "')";
+			DB_query($sql2);
+			return true;
+		}
+		
+		return false;
 	}
 }
 ?>

@@ -42,7 +42,7 @@ if (!defined('XHTML')) {
 // Retrieve request vars
 COM_setArgNames(array('tag'));
 $tag =COM_getArgument('tag');
-$tags = explode('_', $tag);
+$tags = explode('_', COM_applyFilter($tag));
 if (count($tags) == 0) {
 	COM_refresh($_CONF['site_url'] . '/index.php');
 	exit;

@@ -1,5 +1,5 @@
 <h2>{header}</h2>
 {navbar}
-<p>{msg}</p>
+{msg}
 {content}
 <br{xhtml}>

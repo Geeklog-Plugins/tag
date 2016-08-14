@@ -249,6 +249,8 @@ a.tag_lv9:hover
 * For displaying tag menu
 */
 
+/* Content area */
+
 div#tag_menu
 {
 }
@@ -264,4 +266,24 @@ div#tag_menu_body
 
 div#tag_menu_body li a
 {
+}
+
+/* Menu block */
+
+div#bl_tag_menu
+{
+}
+
+a.bl_tag_menu_item,
+a.bl_tag_menu_item:visited
+{
+	color: blue;
+	text-decoration: none;
+}
+
+a.bl_tag_menu_item:hover
+{
+	color: white;
+	background-color: blue;
+	text-decoration: none;
 }
