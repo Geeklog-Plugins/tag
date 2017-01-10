@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/badword.class.php                           |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -32,6 +32,7 @@
 // +---------------------------------------------------------------------------+
 
 require_once '../../../lib-common.php';
+require_once dirname(__FILE__) . '/compat.php';
 
 global $_CONF, $_PLUGINS;
 
@@ -117,13 +118,12 @@ class TagBadword
 		$word = TAG_post('word');
 		$word = trim($word);
 		
-		if (empty($word)
-		 OR (DB_count($_TABLES['tag_badwords'], 'badword', addslashes($word)) > 0)) {
+		if (empty($word) || (DB_count($_TABLES['tag_badwords'], 'badword', DB_escapeString($word)) > 0)) {
 			return TAG_str('add_fail');
 		}
 
 		$sql = "INSERT INTO {$_TABLES['tag_badwords']} (badword) "
-			 . "VALUES ('" . addslashes($word) . "')";
+			 . "VALUES ('" . DB_escapeString($word) . "')";
 		$result = DB_query($sql);
 
 		// Deletes the bad word from list and map if it already exists
@@ -131,11 +131,11 @@ class TagBadword
 
 		if ($tag_id !== false) {
 			$sql = "DELETE FROM {$_TABLES['tag_list']} "
-				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
+				 . "WHERE (tag_id = '" . DB_escapeString($tag_id) . "')";
 			DB_query($sql);
 
 			$sql = "DELETE FROM {$_TABLES['tag_map']} "
-				 . "WHERE (tag_id = '" . addslashes($tag_id) . "')";
+				 . "WHERE (tag_id = '" . DB_escapeString($tag_id) . "')";
 			DB_query($sql);
 		}
 
@@ -159,14 +159,14 @@ class TagBadword
 
 		$words = TAG_post('words');
 
-		if (!is_array($words) OR (count($words) === 0)) {
+		if (!is_array($words) || (count($words) === 0)) {
 			return '';
 		}
 
 		/**
 		* Deletes a bad word from DB
 		*/
-		$words4db = array_map('addslashes', $words);
+		$words4db = array_map('DB_escapeString', $words);
 		$words4db = "('" . implode("','", $words4db) . "')";
 
 		$sql = "DELETE FROM {$_TABLES['tag_badwords']} "

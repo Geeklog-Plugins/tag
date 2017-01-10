@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/index.php                                   |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -33,6 +33,7 @@
 
 require_once '../../../lib-common.php';
 require_once $_CONF['path_system'] . 'classes/navbar.class.php';
+require_once dirname(__FILE__) . '/compat.php';
 
 if (!in_array('tag', $_PLUGINS)) {
 	COM_output(COM_refresh($_CONF['site_url'] . '/index.php'));
@@ -49,21 +50,21 @@ $actions  = array('view', 'add', 'edit', 'delete', 'doAdd', 'doEdit', 'doDelete'
 // Retrieves request vars
 $cmd = TAG_get('cmd');
 
-if ($cmd === FALSE) {
+if ($cmd === false) {
 	$cmd = TAG_post('cmd');
 }
 
-if (($cmd === FALSE) OR !in_array($cmd, $commands)) {
+if (($cmd === false) || !in_array($cmd, $commands)) {
 	$cmd = 'stats';
 }
 
 $action = TAG_get('action');
 
-if ($action === FALSE) {
+if ($action === false) {
 	$action = TAG_post('action', true);
 }
 
-if (($action === FALSE) OR !in_array($action, $actions)) {
+if (($action === false) || !in_array($action, $actions)) {
 	$action = 'view';
 }
 
@@ -143,11 +144,5 @@ switch ($action) {
 $T->set_var('content', $content);
 $T->parse('output', 'admin');
 $content = $T->finish($T->get_var('output'));
-
-if (is_callable('COM_createHTMLDocument')) {
-	$display = COM_createHTMLDocument($content);
-} else {
-	$display = COM_siteHeader() . $content . COM_siteFooter();
-}
-
+$display = COM_createHTMLDocument($content);
 COM_output($display);

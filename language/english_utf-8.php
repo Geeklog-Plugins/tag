@@ -3,7 +3,7 @@
 // +---------------------------------------------------------------------------+
 // | Tag Plugin for Geeklog - The Ultimate Weblog                              |
 // +---------------------------------------------------------------------------|
-// | geeklog/plugins/tag/language/english.php                                  |
+// | geeklog/plugins/tag/language/english_utf-8.php                            |
 // +---------------------------------------------------------------------------|
 // | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |

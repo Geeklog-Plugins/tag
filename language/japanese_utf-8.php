@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------|
 // | geeklog/plugins/tag/language/japanese_utf-8.php                           |
 // +---------------------------------------------------------------------------|
-// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -137,5 +137,5 @@ $LANG_fs['tag'] = array(
 
 // Note: entries 0, 1, 9, and 12 are the same as in $LANG_configselects['Core']
 $LANG_configselects['tag'] = array(
-    0 => array('はい' => TRUE, 'いいえ' => FALSE),
+    0 => array('はい' => true, 'いいえ' => false),
 );

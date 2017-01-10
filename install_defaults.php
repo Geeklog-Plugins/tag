@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/config.php                                            |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -33,14 +33,11 @@
 
 global $_DB_table_prefix, $_TABLES, $_TAG_CONF, $_TAG_DEFAULT;
 
-// Sets plugin table prefix the same as Geeklog's
-$_TAG_table_prefix = $_DB_table_prefix;
-
 // Adds to $_TABLES array the tables your plugin uses
-$_TABLES['tag_list']      = $_TAG_table_prefix . 'tag_list';
-$_TABLES['tag_map']       = $_TAG_table_prefix . 'tag_map';
-$_TABLES['tag_badwords']  = $_TAG_table_prefix . 'tag_badwords';
-$_TABLES['tag_menu']      = $_TAG_table_prefix . 'tag_menu';
+$_TABLES['tag_list']      = $_DB_table_prefix . 'tag_list';
+$_TABLES['tag_map']       = $_DB_table_prefix . 'tag_map';
+$_TABLES['tag_badwords']  = $_DB_table_prefix . 'tag_badwords';
+$_TABLES['tag_menu']      = $_DB_table_prefix . 'tag_menu';
 
 require_once dirname(__FILE__) . '/config.php';
 
@@ -50,8 +47,8 @@ $_TAG_DEFAULT = array();
 * User Configurations
 */
 
-// If this is TRUE, we don't show 'Tag' entry on the global menu
-$_TAG_DEFAULT['hidetagmenu'] = FALSE;
+// If this is true, we don't show 'Tag' entry on the global menu
+$_TAG_DEFAULT['hidetagmenu'] = false;
 
 // Default name of a tag cloud block which will be created during the installation.
 // If you use Geeklog-1.4.1 or later and disable/enable the tag plugin, the block
@@ -66,21 +63,21 @@ $_TAG_DEFAULT['tag_name'] = 'tag';
 // Max length of a tag in bytes.  Should not be longer than 255.
 $_TAG_DEFAULT['max_tag_len'] = 60;
 
-// If this is TRUE, the tag "Geeklog" will NOT be identified with the tag "geeklog".
-$_TAG_DEFAULT['tag_case_sensitive'] = FALSE;
+// If this is true, the tag "Geeklog" will NOT be identified with the tag "geeklog".
+$_TAG_DEFAULT['tag_case_sensitive'] = false;
 
-// If this is TRUE, each tag consisting only of alphabets will be stemmed.  For
+// If this is true, each tag consisting only of alphabets will be stemmed.  For
 // example, tag "realize" will be stemmed into "real", thus tag "realize" will
 // be identidied with tag "real".
 //
 // @WARNING: The stemming feature is still not perfect.  For example, 'Firefox'
 //           is stemmed into 'Firefoxi'.  So, I don't recommend you set
-//           $_TAG_DEFAULT['tag_stemming'] to TRUE for the time being.
-$_TAG_DEFAULT['tag_stemming'] = FALSE;
+//           $_TAG_DEFAULT['tag_stemming'] to true for the time being.
+$_TAG_DEFAULT['tag_stemming'] = false;
 
 // Whether to use a list of bad words.  If a tag is regarded as bad, it will be
 // replaced with $LANG_TAG['badword_replace'] automatically.
-$_TAG_DEFAULT['tag_check_badword'] = TRUE;
+$_TAG_DEFAULT['tag_check_badword'] = true;
 
 // A string to be used as a spacer in displaying tag clouds
 $_TAG_DEFAULT['tag_cloud_spacer'] = '  ';
@@ -114,7 +111,7 @@ $_TAG_DEFAULT['tag_cloud_threshold'][9] = 10;
 $_TAG_DEFAULT['tag_cloud_threshold_max_count'] = 20;
 
 // Whether to replace an underscore included in tag texts with a space
-$_TAG_DEFAULT['replace_underscore'] = FALSE;
+$_TAG_DEFAULT['replace_underscore'] = false;
 
 // The number of key words to be included in 
 // <meta name="keywords" content="foo,bar"> tag
@@ -125,7 +122,7 @@ $_TAG_DEFAULT['num_keywords'] = 0;
 // provided by dengen.
 //
 // @CAUTION: This feature is available for Geeklog-1.4.1 or later.
-$_TAG_DEFAULT['publish_as_template_vars'] = FALSE;
+$_TAG_DEFAULT['publish_as_template_vars'] = false;
 
 // This is work vars and should be left untouched by users
 $_TAG_DEFAULT['template_vars'] = array();
@@ -146,7 +143,7 @@ $_TAG_DEFAULT['menu_indenter'] = '&nbsp;&nbsp;&nbsp;';
 // Whether to add the number of items to each tag menu item
 //
 // @note This feature could be a costly operation
-$_TAG_DEFAULT['add_num_items_to_menu'] = FALSE;
+$_TAG_DEFAULT['add_num_items_to_menu'] = false;
 
 /**
 * Initialize Tag plugin configuration
@@ -155,7 +152,7 @@ $_TAG_DEFAULT['add_num_items_to_menu'] = FALSE;
 * Initial values will be taken from $_TAG_CONF if available (e.g. from an old
 * config.php), uses $_TAG_CONF otherwise.
 *
-* @return   boolean     TRUE: success; FALSE: an error occurred
+* @return   boolean     true: success; false: an error occurred
 */
 function plugin_initconfig_tag() {
     global $_TAG_DEFAULT;
@@ -165,120 +162,120 @@ function plugin_initconfig_tag() {
 	
     if (!$c->group_exists($me)) {
 		$order = 0;
-        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, $order, TRUE, $me);
-        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, $order, TRUE, $me);
+        $c->add('sg_main', null, 'subgroup', 0, 0, null, $order, true, $me);
+        $c->add('fs_main', null, 'fieldset', 0, 0, null, $order, true, $me);
 		$order += 10;
         
         // Main
 		$c->add(
 			'hidetagmenu', $_TAG_DEFAULT['hidetagmenu'], 'select', 0, 0, 0,
-			$order, TRUE, $me
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'default_block_name', $_TAG_DEFAULT['default_block_name'], 'text',
-			0, 0, NULL, $order, TRUE, $me
+			0, 0, null, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
-			'tag_name', $_TAG_DEFAULT['tag_name'], 'text', 0, 0, NULL, $order,
-			TRUE, $me
+			'tag_name', $_TAG_DEFAULT['tag_name'], 'text', 0, 0, null, $order,
+			true, $me
 		);
 		$order += 10;
 		
 		$c->add(
-			'max_tag_len', $_TAG_DEFAULT['max_tag_len'], 'text', 0, 0, NULL,
-			$order, TRUE, $me
+			'max_tag_len', $_TAG_DEFAULT['max_tag_len'], 'text', 0, 0, null,
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'tag_case_sensitive', $_TAG_DEFAULT['tag_case_sensitive'], 'select',
-			0, 0, 0, $order, TRUE, $me
+			0, 0, 0, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'tag_stemming', $_TAG_DEFAULT['tag_stemming'], 'select', 0, 0, 0,
-			$order, TRUE, $me
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'tag_check_badword', $_TAG_DEFAULT['tag_check_badword'], 'select',
-			0, 0, 0, $order, TRUE, $me
+			0, 0, 0, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'tag_cloud_spacer', $_TAG_DEFAULT['tag_cloud_spacer'], 'text', 0, 0,
-			NULL, $order, TRUE, $me
+			null, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
-			'max_tag_cloud', $_TAG_DEFAULT['max_tag_cloud'], 'text', 0, 0, NULL,
-			$order, TRUE, $me
+			'max_tag_cloud', $_TAG_DEFAULT['max_tag_cloud'], 'text', 0, 0, null,
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'max_tag_cloud_in_block', $_TAG_DEFAULT['max_tag_cloud_in_block'],
-			'text', 0, 0, NULL, $order, TRUE, $me
+			'text', 0, 0, null, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'tag_cloud_threshold', $_TAG_DEFAULT['tag_cloud_threshold'], '%text',
-			0, 0, NULL, $order, TRUE, $me
+			0, 0, null, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'tag_cloud_threshold_max_count',
-			$_TAG_DEFAULT['tag_cloud_threshold_max_count'], 'text', 0, 0, NULL,
-			$order, TRUE, $me
+			$_TAG_DEFAULT['tag_cloud_threshold_max_count'], 'text', 0, 0, null,
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'replace_underscore', $_TAG_DEFAULT['replace_underscore'], 'select',
-			0, 0, 0, $order, TRUE, $me
+			0, 0, 0, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
-			'num_keywords', $_TAG_DEFAULT['num_keywords'], 'text', 0, 0, NULL,
-			$order, TRUE, $me
+			'num_keywords', $_TAG_DEFAULT['num_keywords'], 'text', 0, 0, null,
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'publish_as_template_vars', $_TAG_DEFAULT['publish_as_template_vars'],
-			'select', 0, 0, 0, $order, TRUE, $me
+			'select', 0, 0, 0, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'default_block_name_menu', $_TAG_DEFAULT['default_block_name_menu'],
-			'text', 0, 0, NULL, $order, TRUE, $me
+			'text', 0, 0, null, $order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
-			'menu_indenter', $_TAG_DEFAULT['menu_indenter'], 'text', 0, 0, NULL,
-			$order, TRUE, $me
+			'menu_indenter', $_TAG_DEFAULT['menu_indenter'], 'text', 0, 0, null,
+			$order, true, $me
 		);
 		$order += 10;
 		
 		$c->add(
 			'add_num_items_to_menu', $_TAG_DEFAULT['add_num_items_to_menu'],
-			'select', 0, 0, 0, $order, TRUE, $me
+			'select', 0, 0, 0, $order, true, $me
 		);
 		$order += 10;
 	}
 	
-    return TRUE;
+    return true;
 }

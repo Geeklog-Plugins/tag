@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/tag/index.php                                                 |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -64,11 +64,11 @@ if ($tag !== '') {
 	$tag = TAG_normalize($tag);
 	$tag_id = TAG_getTagId($tag);
 
-	if ($tag_id !== FALSE) {
+	if ($tag_id !== false) {
 		TAG_increaseHitCount($tag_id);
 		$text = $tag;
 
-		if ($_TAG_CONF['replace_underscore'] === TRUE) {
+		if ($_TAG_CONF['replace_underscore'] === true) {
 			$text = str_replace('_', ' ', $text);
 		}
 

@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | geeklog/plugins/tag/autoinstall.php                                       |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2010-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2010-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // +---------------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 // |                                                                           |
 // +---------------------------------------------------------------------------+
 
-if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== FALSE) {
+if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== false) {
 	die('This file can not be used on its own!');
 }
 
@@ -111,7 +111,7 @@ function plugin_compatible_with_this_version_tag($pi_name) {
 		$gl_version = preg_replace('/[^0-9\.]/', '', VERSION);
 		$retval = (version_compare($gl_version, $_TAG_CONF['pi_gl_version']) >= 0);
 	} else {
-		$retval = FALSE;
+		$retval = false;
 	}
 
 	// Checks if the version of the staticpages plugin is 1.6.3 or greater
@@ -119,10 +119,16 @@ function plugin_compatible_with_this_version_tag($pi_name) {
 	$version = preg_replace('/[^0-9\.]/', '', $version);
 
 	if (version_compare($version, '1.6.3') < 0) {
-		$retval = FALSE;
+		$retval = false;
 	}
 
 	return $retval;
+}
+
+if (!is_callable('DB_escapeString')) {
+	function DB_escapeString($str) {
+		return addslashes($str);
+	}
 }
 
 /**
@@ -139,9 +145,9 @@ function plugin_postinstall_tag($pi_name) {
 			 . "  (is_enabled, name, type, title, blockorder, onleft, "
 			 . "  phpblockfn, owner_id, group_id, perm_owner, perm_group, "
 			 . "  perm_members, perm_anon) "
-			 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name'])
-			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
-			 . "', 1, 0, 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
+			 . "VALUES (1, '" . DB_escapeString($_TAG_CONF['default_block_name'])
+			 . "', 'phpblock', '" . DB_escapeString($LANG_TAG['default_block_title'])
+			 . "', 1, 0, 'phpblock_tag_cloud', '" . DB_escapeString($_USER['uid'])
 			 . "', 1, 3, 3, 2, 2)";
 		DB_query($sql);
 		$bid = DB_insertId();
@@ -154,9 +160,9 @@ function plugin_postinstall_tag($pi_name) {
 		$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, "
 			 . "  blockorder, onleft, phpblockfn, owner_id, group_id, "
 			 . "  perm_owner, perm_group, perm_members, perm_anon) "
-			 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name_menu'])
-			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
-			 . "', 1, 1, 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
+			 . "VALUES (1, '" . DB_escapeString($_TAG_CONF['default_block_name_menu'])
+			 . "', 'phpblock', '" . DB_escapeString($LANG_TAG['default_block_title_menu'])
+			 . "', 1, 1, 'phpblock_tag_menu', '" . DB_escapeString($_USER['uid'])
 			 . "', 1, 3, 3, 2, 2)";
 		DB_query($sql);
 		$bid = DB_insertId();
@@ -170,9 +176,9 @@ function plugin_postinstall_tag($pi_name) {
 			 . "  (is_enabled, name, type, title, tid, blockorder, onleft, "
 			 . "  phpblockfn, owner_id, group_id, perm_owner, perm_group, "
 			 . "  perm_members, perm_anon) "
-			 . "VALUES (1, '" . addslashes($_TAG_CONF['default_block_name'])
-			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title'])
-			 . "', 'all', '1', '0', 'phpblock_tag_cloud', '" . addslashes($_USER['uid'])
+			 . "VALUES (1, '" . DB_escapeString($_TAG_CONF['default_block_name'])
+			 . "', 'phpblock', '" . DB_escapeString($LANG_TAG['default_block_title'])
+			 . "', 'all', '1', '0', 'phpblock_tag_cloud', '" . DB_escapeString($_USER['uid'])
 			 . "', '1', '3', '3', '2', '2')";
 		DB_query($sql);
 
@@ -180,9 +186,9 @@ function plugin_postinstall_tag($pi_name) {
 		$sql = "INSERT INTO {$_TABLES['blocks']} (is_enabled, name, type, title, "
 			 . "  tid, blockorder, onleft, phpblockfn, owner_id, group_id, "
 			 . "  perm_owner, perm_group, perm_members, perm_anon) "
-			 . "VALUES ('1', '" . addslashes($_TAG_CONF['default_block_name_menu'])
-			 . "', 'phpblock', '" . addslashes($LANG_TAG['default_block_title_menu'])
-			 . "', 'all', '1', '1', 'phpblock_tag_menu', '" . addslashes($_USER['uid'])
+			 . "VALUES ('1', '" . DB_escapeString($_TAG_CONF['default_block_name_menu'])
+			 . "', 'phpblock', '" . DB_escapeString($LANG_TAG['default_block_title_menu'])
+			 . "', 'all', '1', '1', 'phpblock_tag_menu', '" . DB_escapeString($_USER['uid'])
 			 . "', '1', '3', '3', '2', '2')";
 		DB_query($sql);
 	}
@@ -190,5 +196,5 @@ function plugin_postinstall_tag($pi_name) {
 	// Scans all contents for tags
 	TAG_scanAll();
 
-	return TRUE;
+	return true;
 }

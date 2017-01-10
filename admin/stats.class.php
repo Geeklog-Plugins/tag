@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/admin/plugins/tag/stats.class.php                             |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2011 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -32,10 +32,10 @@
 // +---------------------------------------------------------------------------+
 
 require_once '../../../lib-common.php';
+require_once dirname(__FILE__) . '/compat.php';
 
 if (!in_array('tag', $_PLUGINS)) {
-	COM_output(COM_refresh($_CONF['site_url'] . '/index.php'));
-	exit;
+	COM_redirect($_CONF['site_url'] . '/index.php');
 }
 
 TAG_checkAdmin();
@@ -71,7 +71,7 @@ class TagStats
 			 . "FROM {$_TABLES['tag_list']} AS L "
 			 . "LEFT JOIN {$_TABLES['tag_map']} AS m "
 			 . "ON L.tag_id = m.tag_id "
-			 . "GROUP BY m.tag_id "
+			 . "GROUP BY L.tag_id, L.tag, L.hits, m.tag_id "
 			 . "ORDER BY cnt DESC, tag";
 		$result = DB_query($sql);
 
@@ -105,9 +105,9 @@ class TagStats
 				  .  'type="checkbox" value="' . TAG_escape($A['tag_id'])
 				  .  '"' . XHTML . '><label for="tag' . TAG_escape($tag_id)
 				  .  '">' . TAG_escape($A['tag']) . '</label></td>'
-				  .  '<td style="text-align: right;">' .  TAG_escape($A['cnt'])
+				  .  '<td style="text-align: right;">' .  TAG_escape(COM_numberFormat($A['cnt']))
 				  .  '</td><td style="text-align: right;">'
-				  .  TAG_escape($A['hits']) .  '</td></tr>' . LB;
+				  .  TAG_escape(COM_numberFormat($A['hits'])) .  '</td></tr>' . LB;
 			$sw = ($sw == 1) ? 2 : 1;
 		}
 
@@ -133,7 +133,7 @@ class TagStats
 		// Retrieves request vars
 		$tag_ids = TAG_post('tag_ids', true, true);
 
-		if (!is_array($tag_ids) OR (count($tag_ids) === 0)) {
+		if (!is_array($tag_ids) || (count($tag_ids) === 0)) {
 			return '';
 		}
 
@@ -144,7 +144,7 @@ class TagStats
 			return '';
 		}
 
-		$tag_ids = array_map('addslashes', $tag_ids);
+		$tag_ids = array_map('DB_escapeString', $tag_ids);
 		$tag_ids = "'" . implode("','", $tag_ids) . "'";
 
 		// Registers banned words into DB

@@ -5,7 +5,7 @@
 // +---------------------------------------------------------------------------+
 // | public_html/tag/menu.php                                                  |
 // +---------------------------------------------------------------------------+
-// | Copyright (C) 2008-2012 mystral-kk - geeklog AT mystral-kk DOT net        |
+// | Copyright (C) 2008-2017 mystral-kk - geeklog AT mystral-kk DOT net        |
 // |                                                                           |
 // | Constructed with the Universal Plugin                                     |
 // | Copyright (C) 2002 by the following authors:                              |
@@ -38,6 +38,12 @@ if (!in_array('tag', $_PLUGINS)) {
 	exit;
 }
 
+if (!is_callable('DB_escapeString')) {
+	function DB_escapeString($str) {
+		return addslashes($str);
+	}
+}
+
 // Retrieves request vars
 COM_setArgNames(array('tag'));
 $tag  = COM_getArgument('tag');
@@ -65,21 +71,20 @@ foreach ($lang_vars as $lang_var) {
 $tag_menu = array();
 $sql = "SELECT type, sid, COUNT(sid) AS cnt "
 	 . "  FROM {$_TABLES['tag_map']} "
-	 . "WHERE (tag_id IN ('" . implode("','", array_map('addslashes', $tags)) . "')) "
+	 . "WHERE (tag_id IN ('" . implode("','", array_map('DB_escapeString', $tags)) . "')) "
 	 . "GROUP BY type, sid "
-	 . "HAVING cnt = '" . addslashes(count($tags)) . "'";
+	 . "HAVING cnt = " . count($tags);
 $result = DB_query($sql);
 
 if (!DB_error()) {
-	while (($A = DB_fetchArray($result)) !== FALSE) {
+	while (($A = DB_fetchArray($result)) !== false) {
 		$url   = '';
 		$title = '';
 		$item  = '<li><a href="';
 
 		switch ($A['type']) {
 			case 'article':
-				/* Falls through to default */
-
+				// Falls through to default
 			default:
 				$url = COM_buildURL(
 					$_CONF['site_url'] . '/article.php?story=' . TAG_escape($A['sid'])
@@ -107,7 +112,7 @@ if (count($tag_menu) > 0) {
 
 $tags = array_map('TAG_getTagName', $tags);
 
-if ($_TAG_CONF['replace_underscore'] === TRUE) {
+if ($_TAG_CONF['replace_underscore'] === true) {
 	$temp = array();
 
 	foreach ($tags as $tag) {
