@@ -32,7 +32,7 @@
 // +---------------------------------------------------------------------------+
 
 if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== false) {
-    die('This file cannot be used on its own.');
+	die('This file cannot be used on its own.');
 }
 
 // Includes language file 
@@ -198,7 +198,10 @@ function plugin_upgrade_tag() {
 		case '0.5.3':
 		case '0.5.4':
 		case '0.6.0':
+		case '0.6.1':
 		default:
+			// Change the length of the primary key of the `tag_badwords` table to prevent an error in case of "utf8mb4" charset
+			DB_query("ALTER TABLE {$_TABLES['tag_badwords']} CHANGE `badword` `badword` varchar(180) NOT NULL FIRST");
 			break;
 	}
 
@@ -241,7 +244,9 @@ function plugin_autouninstall_tag() {
 * to <head> section
 */
 function plugin_getheadercode_tag() {
-	global $_CONF, $_USER, $_TAG_CONF;
+	global $_CONF, $_USER, $_TAG_CONF, $_SCRIPTS;
+
+	$retval = '';
 
 	if (!defined('XHTML')) {
 		define('XHTML', '');
@@ -249,13 +254,17 @@ function plugin_getheadercode_tag() {
 
 	$theme = isset($_USER['theme']) ? $_USER['theme'] : $_CONF['theme'];
 	clearstatcache();
+	$path = file_exists($_CONF['path_themes'] . $theme . '/tag.css')
+		 ? '/layout/' . $theme . '/tag.css'
+		 : '/tag/tag.css';
 
-	$url = file_exists($_CONF['path_themes'] . $theme . '/tag.css')
-		 ? $_CONF['site_url'] . '/layout/' . $theme . '/tag.css'
-		 : $_CONF['site_url'] . '/tag/tag.css';
+    if (!empty($_SCRIPTS)) {
+        $_SCRIPTS->setCSSFile('tag.css', $path, false);
+    } else {
+		$retval .= '<link rel="stylesheet" type="text/css" href="' 
+			. $_CONF['site_url'] . $path . '"' . XHTML . '>';
+    }
 
-	$retval = '<link rel="stylesheet" type="text/css" href="' . $url . '"'
-			. XHTML . '>';
 
 	if ($_TAG_CONF['num_keywords'] > 0) {
 		$keywords = TAG_getKeywords($_TAG_CONF['num_keywords']);
@@ -901,7 +910,7 @@ function plugin_itemsaved_tag($id, $type, $old_id = '') {
 			if (TAG_checkValidType($type) == true) {
 				$function = 'plugin_tag_scantag_' . $type;
 				$tags = $function($id);
- 			} else {
+			} else {
 				COM_errorLog(__FUNCTION__ . ': $id = ' . $id . ', $type = ' . $type);
 			}
 			
@@ -1303,8 +1312,8 @@ function TAG_scanAll() {
 		if (TAG_checkValidType($pi_name) == true) {
 			$function = 'plugin_tag_scanall_' . $pi_name;
 			$function();
- 		}
- 	}
+		}
+	}
 }
 
 /**
@@ -1537,8 +1546,8 @@ function TAG_checkValidType($type) {
 function TAG_checkAdmin() {
 	// Only lets admin users access this page
 	if (!SEC_hasRights('tag.admin')) {
-	    // Someone is trying to illegally access the current page
-	    COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
+		// Someone is trying to illegally access the current page
+		COM_errorLog("Someone has tried to illegally access the tag Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: {$_SERVER['REMOTE_ADDR']}", 1);
 		$content = COM_startBlock(TAG_str('access_denied'))
 				 . TAG_str('access_denied_msg')
 				 . COM_endBlock();
@@ -1546,11 +1555,11 @@ function TAG_checkAdmin() {
 		if (is_callable('COM_createHTMLDocument')) {
 			$display = COM_createHTMLDocument($content);
 		} else {
-		    $display = COM_siteHeader() . $content . COM_endBlock();
+			$display = COM_siteHeader() . $content . COM_endBlock();
 		}
 		
-	    COM_output($display);
-	    die(1);
+		COM_output($display);
+		die(1);
 	}
 }
 
@@ -1596,7 +1605,7 @@ if (in_array('staticpages', $_PLUGINS)) {
 	*
 	*/
 	function plugin_tag_scantag_staticpages($id) {
-	    global $_TABLES;
+		global $_TABLES;
 
 		$retval = array();
 
@@ -1627,7 +1636,7 @@ if (in_array('staticpages', $_PLUGINS)) {
 		$tags = TAG_scanTag($sp_retval['sp_content']);
 		$retval = array_unique($tags);
 
-	    return $retval;
+		return $retval;
 	}
 
 	/**

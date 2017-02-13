@@ -58,7 +58,7 @@ CREATE INDEX idx_tag_map_tag_id ON {$_TABLES['tag_map']} (tag_id)
 
 $_SQL[] = "
 CREATE TABLE {$_TABLES['tag_badwords']} (
-	badword VARCHAR(255) NOT NULL,
+	badword VARCHAR(180) NOT NULL,
 	PRIMARY KEY badword(badword)
 ) ENGINE=MyISAM
 ";
